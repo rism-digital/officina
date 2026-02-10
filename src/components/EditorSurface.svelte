@@ -11,13 +11,20 @@
   let svgOverlay: HTMLDivElement | null = null;
   let resizeObserver: ResizeObserver | null = null;
   let lastSize = { width: 0, height: 0 };
+  let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+  const RESIZE_DEBOUNCE_MS = 150;
 
   function emitSize(width: number, height: number) {
     if (!onResize) return;
     if (width === lastSize.width && height === lastSize.height) return;
     lastSize = { width, height };
-    console.log(lastSize)
-    onResize(lastSize);
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+    }
+    resizeTimer = setTimeout(() => {
+      resizeTimer = null;
+      onResize(lastSize);
+    }, RESIZE_DEBOUNCE_MS);
   }
 
   onMount(() => {
@@ -34,11 +41,14 @@
   onDestroy(() => {
     resizeObserver?.disconnect();
     resizeObserver = null;
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+      resizeTimer = null;
+    }
   });
 
   function updateOverlay() {
     if (!svgWrapper || !svgOverlay) return;
-    console.log('Updating overlay');
     svgOverlay.innerHTML = svgWrapper.innerHTML;
 
     svgWrapper.querySelectorAll('g.bounding-box').forEach((node) => {
