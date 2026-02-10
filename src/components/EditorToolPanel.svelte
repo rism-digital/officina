@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
     import type { Tab } from "../app/types";
 
     import ScoreTab from "./ScoreTab.svelte";
@@ -9,7 +10,12 @@
         { label: "Content", value: 2, component: ContentTab },
     ];
 
-    export let activeTabValue = 1;
+    export let activeTabValue = 2;
+
+    const dispatch = createEventDispatcher<{ selectElement: string }>();
+    function forwardSelect(event: CustomEvent<string>) {
+        dispatch("selectElement", event.detail);
+    }
 
     const handleClick = (tabValue: number) => () => {
         activeTabValue = tabValue;
@@ -34,11 +40,13 @@
             {#each items as item}
                 {#if activeTabValue == item.value}
                     <div class="vrv-tab-content-panel" style="display: flex;">
-                        <svelte:component this={item.component} />
+                        <svelte:component
+                            this={item.component}
+                            on:selectElement={forwardSelect}
+                        />
                     </div>
                 {/if}
             {/each}
-
         </div>
     </div>
 </div>

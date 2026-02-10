@@ -76,7 +76,7 @@
       xmlIdSeed: 1,
     };
   }
-  
+
   async function updateRenderedView() {
     const { currentPage } = get(verovioState);
     const svg = await bridge.verovio.renderToSVG(currentPage);
@@ -97,7 +97,11 @@
 
   async function loadData(data: string) {
     workerStatus.set("busy");
-    verovioState.update((current) => ({ ...current, currentPage: 1, pageCount: 0 }));
+    verovioState.update((current) => ({
+      ...current,
+      currentPage: 1,
+      pageCount: 0,
+    }));
     if (lastLayoutSize.width && lastLayoutSize.height) {
       const options = buildVerovioOptions(lastLayoutSize);
       await bridge.verovio.setOptions(options);
@@ -121,7 +125,10 @@
     verovioState.update((current) => ({ ...current, pageCount }));
     const { currentPage } = get(verovioState);
     if (currentPage > pageCount) {
-      verovioState.update((current) => ({ ...current, currentPage: pageCount }));
+      verovioState.update((current) => ({
+        ...current,
+        currentPage: pageCount,
+      }));
     }
     await updateRenderedView();
   }
@@ -178,6 +185,11 @@
     if (!id) {
       await setSelection({ type: "none" });
       return;
+    }
+    const page = await bridge.verovio.getPageWithElement(id);
+    console.log("Element is on page", page);
+    if (page && page > 0 && page !== get(verovioState).currentPage) {
+      await setCurrentPage(page);
     }
     await setSelection({
       type: "block",

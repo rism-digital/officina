@@ -8,6 +8,10 @@
   export let onResize: (size: { width: number; height: number }) => void;
   export let onElementSelect: (id: string | null) => void;
 
+  function forwardSelect(event: CustomEvent<string>) {
+    onElementSelect?.(event.detail);
+  }
+
   let verovioView: HTMLDivElement | null = null;
   let svgWrapper: HTMLDivElement | null = null;
   let svgOverlay: HTMLDivElement | null = null;
@@ -154,7 +158,7 @@
 
 <div class="vrv-editor-surface">
   <div class="vrv-h-split">
-    <EditorToolPanel />
+    <EditorToolPanel on:selectElement={forwardSelect} />
     <div class="vrv-v-split">
       <div class="vrv-verovio-view" bind:this={verovioView}>
         <div class="vrv-svg-wrapper" bind:this={svgWrapper}>
