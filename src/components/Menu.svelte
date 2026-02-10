@@ -2,6 +2,8 @@
   import { createEventDispatcher } from "svelte";
 
   export let canZoom = false;
+  export let canGoPrev = false;
+  export let canGoNext = false;
 
   const dispatch = createEventDispatcher<{
     open: void;
@@ -9,6 +11,8 @@
     export: void;
     zoomIn: void;
     zoomOut: void;
+    prevPage: void;
+    nextPage: void;
   }>();
 </script>
 
@@ -45,14 +49,18 @@
   <div class="vrv-btn-group">
     <div class="vrv-h-separator" />
     <div
-      class="vrv-btn-icon-left disabled"
+      class:disabled={!canGoPrev}
+      class="vrv-btn-icon-left"
       style="background-image: url('/icons/toolbar/arrow-left.png');"
       data-before="Previous"
+      on:click={() => dispatch("prevPage")}
     />
     <div
-      class="vrv-btn-icon disabled"
+      class:disabled={!canGoNext}
+      class="vrv-btn-icon"
       style="background-image: url('/icons/toolbar/arrow-right.png');"
       data-before="Next"
+      on:click={() => dispatch("nextPage")}
     />
   </div>
   <div class="vrv-btn-group">

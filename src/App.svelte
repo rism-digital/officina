@@ -77,6 +77,16 @@
     workerStatus.set("idle");
   }
 
+  async function setCurrentPage(nextPage: number) {
+    const { pageCount } = get(verovioState);
+    const clamped = Math.min(Math.max(1, nextPage), Math.max(1, pageCount));
+    verovioState.update((current) => ({ ...current, currentPage: clamped }));
+    if (get(viewModel).svg) {
+      workerStatus.set("busy");
+      await updateRenderedView();
+    }
+  }
+
   async function loadData(data: string) {
     workerStatus.set("busy");
     verovioState.update((current) => ({ ...current, currentPage: 1, pageCount: 0 }));
@@ -190,7 +200,11 @@
     on:export={exportDoc}
     on:zoomIn={() => adjustZoom(ZOOM_STEP)}
     on:zoomOut={() => adjustZoom(-ZOOM_STEP)}
+    on:prevPage={() => setCurrentPage(get(verovioState).currentPage - 1)}
+    on:nextPage={() => setCurrentPage(get(verovioState).currentPage + 1)}
     canZoom={$verovioState.pageCount > 0}
+    canGoPrev={$verovioState.currentPage > 1}
+    canGoNext={$verovioState.currentPage < $verovioState.pageCount}
   ></Menu>
 
   <Toolbar mode={$mode} onToggleMode={toggleMode} />
