@@ -96,6 +96,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     pointer-events: none;
 }
 
+.vrv-btn-icon.disabled,
+.vrv-btn-icon-left.disabled {
+    pointer-events: none;
+}
+
 .vrv-inactivable.inactivated {
     pointer-events: none;
 }
