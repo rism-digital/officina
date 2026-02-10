@@ -1,0 +1,23 @@
+export type VerovioToolkit = {
+  edit: (mei: string) => string;
+  editInfo: () => string;
+  getAvailableOptions: () => string;
+  getDefaultOptions: () => string;
+  getElementAttr: (id: string) => string;
+  getElementsAtTime: (time: number) => string;
+  getLog: () => string;
+  getOptions: () => string;
+  getMEI: () => string;
+  getPageCount: () => number;
+  getPageWithElement: (id: string) => number;
+  loadData: (mei: string) => void;
+  redoLayout: () => void;
+  redoPagePitchPosLayout: () => void;
+  renderToExpansionMap: () => string;
+  renderToMIDI: () => string;
+  renderToSVG: (page: number) => string;
+  select: (id: string) => string;
+  setOptions: (options: string) => void;
+  getVersion: () => string;
+  onRuntimeInitialized: () => void;
+};
