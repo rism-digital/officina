@@ -22,7 +22,7 @@
     "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
   let fileInput: HTMLInputElement | null = null;
   let verovioVersion = "";
-  const ZOOM_STEP = 10;
+  const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
 
   const worker = new Worker(
     new URL("./app/worker/worker.ts", import.meta.url),
@@ -118,10 +118,30 @@
     await updateRenderedView();
   }
 
-  async function adjustZoom(delta: number) {
+  function getNextZoom(current: number, direction: 1 | -1) {
+    const sorted = [...zoomLevels].sort((a, b) => a - b);
+    const index = sorted.findIndex((level) => level >= current);
+    if (direction > 0) {
+      if (index === -1) return sorted[sorted.length - 1];
+      const next = sorted[index] === current ? index + 1 : index;
+      return sorted[Math.min(next, sorted.length - 1)];
+    }
+    if (index === -1) return sorted[0];
+    const prev = sorted[index] === current ? index - 1 : index - 1;
+    return sorted[Math.max(prev, 0)];
+  }
+
+  function getZoomIndex(value: number) {
+    const sorted = [...zoomLevels].sort((a, b) => a - b);
+    const index = sorted.findIndex((level) => level >= value);
+    if (index === -1) return sorted.length - 1;
+    return sorted[index] === value ? index : Math.max(index - 1, 0);
+  }
+
+  async function adjustZoom(direction: 1 | -1) {
     verovioState.update((current) => ({
       ...current,
-      zoom: clampZoom(current.zoom + delta),
+      zoom: clampZoom(getNextZoom(current.zoom, direction)),
     }));
     if (lastLayoutSize.width && lastLayoutSize.height) {
       await applyLayoutForSize(lastLayoutSize);
@@ -198,11 +218,13 @@
     on:open={triggerOpenFile}
     on:save={saveDoc}
     on:export={exportDoc}
-    on:zoomIn={() => adjustZoom(ZOOM_STEP)}
-    on:zoomOut={() => adjustZoom(-ZOOM_STEP)}
+    on:zoomIn={() => adjustZoom(1)}
+    on:zoomOut={() => adjustZoom(-1)}
     on:prevPage={() => setCurrentPage(get(verovioState).currentPage - 1)}
     on:nextPage={() => setCurrentPage(get(verovioState).currentPage + 1)}
     canZoom={$verovioState.pageCount > 0}
+    canZoomIn={getZoomIndex($verovioState.zoom) < zoomLevels.length - 1}
+    canZoomOut={getZoomIndex($verovioState.zoom) > 0}
     canGoPrev={$verovioState.currentPage > 1}
     canGoNext={$verovioState.currentPage < $verovioState.pageCount}
   ></Menu>

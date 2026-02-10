@@ -2,6 +2,8 @@
   import { createEventDispatcher } from "svelte";
 
   export let canZoom = false;
+  export let canZoomIn = true;
+  export let canZoomOut = true;
   export let canGoPrev = false;
   export let canGoNext = false;
 
@@ -66,14 +68,14 @@
   <div class="vrv-btn-group">
     <div class="vrv-h-separator" />
     <div
-      class:disabled={!canZoom}
+      class:disabled={!canZoom || !canZoomOut}
       class="vrv-btn-icon-left"
       style="background-image: url('/icons/toolbar/zoom-out.png');"
       data-before="Zoom out"
       on:click={() => dispatch("zoomOut")}
     />
     <div
-      class:disabled={!canZoom}
+      class:disabled={!canZoom || !canZoomIn}
       class="vrv-btn-icon"
       style="background-image: url('/icons/toolbar/zoom-in.png');"
       data-before="Zoom in"
