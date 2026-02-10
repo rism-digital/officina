@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { ViewModel } from '../app/types';
 
   export let view: ViewModel;
@@ -7,6 +7,8 @@
   export let onResize: (size: { width: number; height: number }) => void;
 
   let verovioView: HTMLDivElement | null = null;
+  let svgWrapper: HTMLDivElement | null = null;
+  let svgOverlay: HTMLDivElement | null = null;
   let resizeObserver: ResizeObserver | null = null;
   let lastSize = { width: 0, height: 0 };
 
@@ -33,6 +35,43 @@
     resizeObserver?.disconnect();
     resizeObserver = null;
   });
+
+  function updateOverlay() {
+    if (!svgWrapper || !svgOverlay) return;
+    console.log('Updating overlay');
+    svgOverlay.innerHTML = svgWrapper.innerHTML;
+
+    svgWrapper.querySelectorAll('g.bounding-box').forEach((node) => {
+      node.remove();
+    });
+
+    svgOverlay.querySelectorAll('g, path, text, ellipse, polyline').forEach((node) => {
+      const element = node as SVGElement;
+      element.style.stroke = 'transparent';
+      element.style.fill = 'transparent';
+    });
+
+    svgOverlay.querySelectorAll('.slur.bounding-box, .tie.bounding-box').forEach((node) => {
+      node.remove();
+    });
+
+    svgOverlay
+      .querySelectorAll('.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path')
+      .forEach((node) => {
+        const element = node as SVGElement;
+        element.style.strokeWidth = '90';
+      });
+  }
+
+  async function refreshOverlay() {
+    await tick();
+    updateOverlay();
+  }
+
+  $: if (view.svg) {
+    void refreshOverlay();
+  }
+
 </script>
 
 <div class="vrv-editor-surface">
@@ -40,9 +79,10 @@
     <div class="vrv-editor-tool-panel"></div>
     <div class="vrv-v-split">
       <div class="vrv-verovio-view" bind:this={verovioView}>
-        <div class="vrv-svg-wrapper">{@html view.svg}</div>
+        <div class="vrv-svg-wrapper" bind:this={svgWrapper}>{@html view.svg}</div>
         <div
           class="vrv-svg-overlay"
+          bind:this={svgOverlay}
           on:focus={() => onSelect(true)}
           on:blur={() => onSelect(false)}
           on:click={() => onSelect(true)}
