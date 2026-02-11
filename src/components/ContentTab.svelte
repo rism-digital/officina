@@ -51,7 +51,13 @@
             </div>
         </div>
         {#if editInfoContent && editInfoContent.context}
-            <TreeNode node={editInfoContent.context} isRoot on:select={handleSelect} on:hover={handleHover} />
+            <TreeNode
+                node={editInfoContent.context}
+                isRoot
+                selectedId={editInfoContent.object?.id ?? null}
+                on:select={handleSelect}
+                on:hover={handleHover}
+            />
         {:else}
             <div class="vrv-tree-root"></div>
         {/if}

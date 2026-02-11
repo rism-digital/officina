@@ -4,6 +4,7 @@
 
   export let node: TreeNodeData;
   export let isRoot = false;
+  export let selectedId: string | null = null;
 
   const dispatch = createEventDispatcher<{
     select: string;
@@ -29,7 +30,7 @@
   data-element={node.element}
 >
   <div
-    class="vrv-mei-element vrv-node-label"
+    class="vrv-mei-element vrv-node-label {node.id === selectedId ? 'target checked' : ''}"
     data-id={node.id}
     data-element={node.element}
     style={isRoot ? "display: none;" : undefined}
@@ -42,7 +43,12 @@
   <div class="vrv-node-children">
     {#if node.children?.length}
       {#each node.children as child}
-        <svelte:self node={child} on:select on:hover />
+        <svelte:self
+          node={child}
+          {selectedId}
+          on:select
+          on:hover
+        />
       {/each}
     {/if}
   </div>
