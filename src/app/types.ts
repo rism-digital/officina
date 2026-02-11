@@ -1,14 +1,15 @@
 export type Mode = 'edit' | 'insert';
 
 export type SelectionInfo = {
-    type: 'none' | 'text' | 'block';
-    label?: string;
-    properties?: Record<string, string>;
+  type: 'none' | 'element';
+  label?: string;
+  id?: string;
 };
 
 export type ViewModel = {
-    svg: string;
-    selection: SelectionInfo;
+  svg: string;
+  svgId: number;
+  selection: SelectionInfo;
 };
 
 export type EditorOp =

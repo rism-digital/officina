@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Mode, SelectionInfo } from "../app/types";
+    import type { Mode } from "../app/types";
 
     export let mode: Mode;
     export let onToggleMode: () => void;

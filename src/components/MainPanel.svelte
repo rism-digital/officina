@@ -23,6 +23,8 @@
     let lastSize = { width: 0, height: 0 };
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     const RESIZE_DEBOUNCE_MS = 150;
+    let lastSvgId = 0;
+    let lastSelectedId: string | null = null;
     let filterMarkup: string = "";
     let mouseoverId: string = "";
 
@@ -101,14 +103,7 @@
             };
             if (element.dataset.bound === "true") return;
             element.dataset.bound = "true";
-            element.addEventListener("mousedown", handleOverlayMouseDown);
-        });
-    }
-
-    function clearOverlaySelection() {
-        if (!svgOverlay) return;
-        svgOverlay.querySelectorAll("g.selected").forEach((node) => {
-            node.classList.remove("selected");
+            element.addEventListener("mousedown", onSVGOverlayMouseDown);
         });
     }
 
@@ -129,8 +124,23 @@
         }
     }
 
+    function clearSelected(id: string | null) {
+        if (!svgWrapper || !id) return;
+        let element = <SVGElement>svgWrapper.querySelector("#" + id);
+        if (element) {
+            highlightWithColor(element, "");
+        }
+    }
+
+    function highlightSelected(id: string | null) {
+        if (!svgWrapper || !id) return;
+        let element = <SVGElement>svgWrapper.querySelector("#" + id);
+        if (element) {
+            highlightWithColor(element, "#f00");
+        }
+    }
+
     function highlightWithColor(g: SVGElement, color: string) {
-        if (!g) return;
         for (const node of Array.from(g.querySelectorAll("*:not(g)"))) {
             const parent = node.parentNode as SVGElement;
             // Do not highlight bounding box elements
@@ -158,7 +168,7 @@
         return node as SVGGElement;
     }
 
-    function handleOverlayMouseDown(event: MouseEvent) {
+    function onSVGOverlayMouseDown(event: MouseEvent) {
         event.stopPropagation();
 
         // Clicking on the overlay - nothing to do
@@ -173,18 +183,38 @@
             return; // this should never happen, but as a safety
         }
 
-        highlightWithColor(node, "#f00");
-
         onElementSelect?.(node.id);
     }
 
     async function refreshOverlay() {
         await tick();
         updateOverlay();
+        if (view.selection?.type === "element") {
+            highlightSelected(view.selection.id ?? null);
+        }
     }
 
-    $: if (view.svg) {
+    $: if (view.svg && view.svgId !== lastSvgId) {
+        lastSvgId = view.svgId;
         refreshOverlay();
+    }
+
+    $: if (!view.svg && lastSvgId !== 0) {
+        lastSvgId = 0;
+        if (svgOverlay) svgOverlay.innerHTML = "";
+    }
+
+    $: if (view.selection?.type === "element") {
+        if (lastSelectedId && lastSelectedId !== view.selection.id) {
+            clearSelected(lastSelectedId);
+        }
+        highlightSelected(view.selection.id ?? null);
+        lastSelectedId = view.selection.id ?? null;
+    }
+
+    $: if (view.selection?.type === "none" && lastSelectedId) {
+        clearSelected(lastSelectedId);
+        lastSelectedId = null;
     }
 </script>
 

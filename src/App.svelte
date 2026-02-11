@@ -24,6 +24,7 @@
     let fileInput: HTMLInputElement | null = null;
     let verovioVersion = "";
     const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
+    let svgRenderId = 0;
 
     const worker = new Worker(
         new URL("./app/worker/worker.ts", import.meta.url),
@@ -81,7 +82,8 @@
         const { currentPage } = get(verovioState);
         const svg = await bridge.verovio.renderToSVG(currentPage);
         const current = get(viewModel);
-        viewModel.set({ ...current, svg });
+        svgRenderId += 1;
+        viewModel.set({ ...current, svg, svgId: svgRenderId });
         workerStatus.set("idle");
     }
 
@@ -172,19 +174,12 @@
     }
 
     async function handleSelect(active: boolean) {
-        if (active) {
-            await setSelection({
-                type: "text",
-                label: "Body Text",
-                properties: {},
-            });
-        } else {
+        if (!active) {
             await setSelection({ type: "none" });
         }
     }
 
     async function handleElementSelect(id: string | null) {
-        console.log(id);
         if (!id) {
             await setSelection({ type: "none" });
             return;
@@ -195,9 +190,8 @@
             await setCurrentPage(page);
         }
         await setSelection({
-            type: "block",
-            label: id,
-            properties: { id },
+            type: "element",
+            id,
         });
     }
 
