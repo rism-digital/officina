@@ -1,9 +1,12 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, tick } from "svelte";
+    import TreeCrumb from "./TreeCrumb.svelte";
     import TreeNode from "./TreeNode.svelte";
     import type { EditInfoContent } from "../app/types";
 
     export let editInfoContent: EditInfoContent | null = null;
+
+    let breadcrumbsWrapper: HTMLDivElement | null = null;
 
     const dispatch = createEventDispatcher<{ selectElement: string; hoverElement: string | null }>();
 
@@ -14,6 +17,17 @@
     function handleHover(event: CustomEvent<string | null>) {
         dispatch("hoverElement", event.detail);
     }
+
+    async function scrollBreadcrumbsToEnd() {
+        await tick();
+        if (breadcrumbsWrapper) {
+            breadcrumbsWrapper.scrollLeft = breadcrumbsWrapper.scrollWidth;
+        }
+    }
+
+    $: if (editInfoContent?.ancestors) {
+        scrollBreadcrumbsToEnd();
+    }
 </script>
 
 <div class="vrv-legend">
@@ -21,9 +35,19 @@
 </div>
 <div class="vrv-field-set" style="flex-grow: 3;">
     <div class="vrv-field-set-panel" style="display: flex;">
-        <div class="vrv-tree-breadcrumbs-wrapper" style="display: block;">
+        <div class="vrv-tree-breadcrumbs-wrapper" bind:this={breadcrumbsWrapper}>
             <div class="vrv-tree-breadcrumbs">
-                <div class="vrv-tree-breadcrumb"></div>
+                <div class="vrv-tree-breadcrumb" />
+                {#if editInfoContent && editInfoContent.ancestors}
+                    {#each editInfoContent.ancestors.reverse() as ancestor}
+                        <TreeCrumb
+                            id={ancestor.id}
+                            label={ancestor.element}
+                            on:select={handleSelect}
+                            on:hover={handleHover}
+                        />
+                    {/each}
+                {/if}
             </div>
         </div>
         {#if editInfoContent && editInfoContent.context}
