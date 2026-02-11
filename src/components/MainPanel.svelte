@@ -4,7 +4,6 @@
     import type { ViewModel } from "../app/types";
 
     export let view: ViewModel;
-    export let onSelect: (active: boolean) => void;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: (id: string | null) => void;
 
@@ -232,8 +231,6 @@
                 <div
                     class="vrv-svg-overlay"
                     bind:this={svgOverlay}
-                    on:focus={() => onSelect(true)}
-                    on:blur={() => onSelect(false)}
                 ></div>
             </div>
             <div class="vrv-keyboard-panel" style="display: flex;"></div>

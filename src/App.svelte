@@ -173,19 +173,12 @@
         viewModel.update((current) => ({ ...current, selection: next }));
     }
 
-    async function handleSelect(active: boolean) {
-        if (!active) {
-            await setSelection({ type: "none" });
-        }
-    }
-
-    async function handleElementSelect(id: string | null) {
+    async function handleSelect(id: string | null) {
         if (!id) {
             await setSelection({ type: "none" });
             return;
         }
         const page = await bridge.verovio.getPageWithElement(id);
-        console.log("Element is on page", page);
         if (page && page > 0 && page !== get(verovioState).currentPage) {
             await setCurrentPage(page);
         }
@@ -264,9 +257,8 @@
 
     <MainPanel
         view={$viewModel}
-        onSelect={handleSelect}
         onResize={applyLayoutForSize}
-        onElementSelect={handleElementSelect}
+        onElementSelect={handleSelect}
     />
 
     <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
