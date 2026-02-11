@@ -12,6 +12,10 @@
     onElementSelect?.(event.detail);
   }
 
+  function forwardHover(event: CustomEvent<string | null>) {
+    highlightHover(event.detail);
+  }
+
   let verovioView: HTMLDivElement | null = null;
   let svgWrapper: HTMLDivElement | null = null;
   let svgOverlay: HTMLDivElement | null = null;
@@ -19,6 +23,8 @@
   let lastSize = { width: 0, height: 0 };
   let resizeTimer: ReturnType<typeof setTimeout> | null = null;
   const RESIZE_DEBOUNCE_MS = 150;
+  let filterMarkup: string = "";
+  let mouseoverId: string = "";
 
   function emitSize(width: number, height: number) {
     if (!onResize) return;
@@ -34,6 +40,15 @@
   }
 
   onMount(() => {
+    fetch("/css/filter.xml")
+      .then((response) => (response.ok ? response.text() : ""))
+      .then((text) => {
+        filterMarkup = text;
+      })
+      .catch(() => {
+        filterMarkup = "";
+      });
+
     if (!verovioView || typeof ResizeObserver === "undefined") return;
     resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -104,6 +119,23 @@
     });
   }
 
+  function clearHover() {
+    if (!svgWrapper || mouseoverId === "") return;
+    let element = <SVGElement>svgWrapper.querySelector('#' + mouseoverId);
+    if (element) element.style.filter = '';
+    mouseoverId = "";
+  }
+
+  function highlightHover(id: string | null) {
+    clearHover();
+    if (!svgWrapper || !id) return;
+    let element = <SVGElement>svgWrapper.querySelector('#' + id);
+    if (element) {
+      element.style.filter = "url(#highlighting)";
+      mouseoverId = id;
+    }
+  }
+
   function getClosestMEIElement(
     node: Element | null,
     elementType?: string,
@@ -156,9 +188,12 @@
   }
 </script>
 
-<div class="vrv-editor-surface">
+<div class="vrv-main-panel">
+  {#if filterMarkup}
+    <div class="vrv-filter" aria-hidden="true">{@html filterMarkup}</div>
+  {/if}
   <div class="vrv-h-split">
-    <SidePanel on:selectElement={forwardSelect} />
+    <SidePanel on:selectElement={forwardSelect} on:hoverElement={forwardHover} />
     <div class="vrv-v-split">
       <div class="vrv-verovio-view" bind:this={verovioView}>
         <div class="vrv-svg-wrapper" bind:this={svgWrapper}>

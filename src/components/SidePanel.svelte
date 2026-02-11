@@ -12,9 +12,15 @@
 
     export let activeTabValue = 2;
 
-    const dispatch = createEventDispatcher<{ selectElement: string }>();
+    const dispatch = createEventDispatcher<{
+        selectElement: string;
+        hoverElement: string | null;
+    }>();
     function forwardSelect(event: CustomEvent<string>) {
         dispatch("selectElement", event.detail);
+    }
+    function forwardHover(event: CustomEvent<string | null>) {
+        dispatch("hoverElement", event.detail);
     }
 
     const handleClick = (tabValue: number) => () => {
@@ -22,7 +28,7 @@
     };
 </script>
 
-<div class="vrv-editor-tool-panel">
+<div class="vrv-side-panel">
     <div class="vrv-tab-group">
         <div class="vrv-tab-selectors">
             {#each items as item}
@@ -43,6 +49,7 @@
                         <svelte:component
                             this={item.component}
                             on:selectElement={forwardSelect}
+                            on:hoverElement={forwardHover}
                         />
                     </div>
                 {/if}

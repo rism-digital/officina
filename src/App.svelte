@@ -77,7 +77,7 @@
     };
   }
 
-  async function updateRenderedView() {
+  async function updateVerovioView() {
     const { currentPage } = get(verovioState);
     const svg = await bridge.verovio.renderToSVG(currentPage);
     const current = get(viewModel);
@@ -91,7 +91,7 @@
     verovioState.update((current) => ({ ...current, currentPage: clamped }));
     if (get(viewModel).svg) {
       workerStatus.set("busy");
-      await updateRenderedView();
+      await updateVerovioView();
     }
   }
 
@@ -109,7 +109,7 @@
     await bridge.verovio.loadData(data);
     const pageCount = await bridge.verovio.getPageCount();
     verovioState.update((current) => ({ ...current, pageCount }));
-    await updateRenderedView();
+    await updateVerovioView();
   }
 
   async function applyLayoutForSize(size: { width: number; height: number }) {
@@ -130,7 +130,7 @@
         currentPage: pageCount,
       }));
     }
-    await updateRenderedView();
+    await updateVerovioView();
   }
 
   function getNextZoom(current: number, direction: 1 | -1) {

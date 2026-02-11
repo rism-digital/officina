@@ -155,7 +155,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     // Properties for button-like elements
     ////////////////////////////////////////////////////////////////////////
 
-    .vrv-editor-surface {
+    .vrv-main-panel {
             display: block;
             height: 100%;
             min-height: 0;
@@ -208,7 +208,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             // Editor panel and splitter
             ////////////////////////////////////////////////////////////////////////
 
-            .vrv-editor-tool-panel {
+            .vrv-side-panel {
                 min-width: $editor-tool-panel-width;
                 max-width: $editor-tool-panel-width;
                 background: $background-light;
@@ -237,14 +237,14 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
         }
 
-        // Actual layout structure under .vrv-editor-surface
+        // Actual layout structure under .vrv-main-panel
         .vrv-h-split {
             display: flex;
             height: 100%;
             min-height: 0;
         }
 
-        .vrv-editor-tool-panel {
+        .vrv-side-panel {
             min-width: $editor-tool-panel-width;
             max-width: $editor-tool-panel-width;
             background: $background-light;

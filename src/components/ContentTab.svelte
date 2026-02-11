@@ -3,7 +3,7 @@
     import TreeNode from "./TreeNode.svelte";
     import type { TreeNodeData } from "../app/types";
 
-    const dispatch = createEventDispatcher<{ selectElement: string }>();
+    const dispatch = createEventDispatcher<{ selectElement: string; hoverElement: string | null }>();
     let root: TreeNodeData | null = null;
 
     onMount(async () => {
@@ -22,6 +22,10 @@
     function handleSelect(event: CustomEvent<string>) {
         dispatch("selectElement", event.detail);
     }
+
+    function handleHover(event: CustomEvent<string | null>) {
+        dispatch("hoverElement", event.detail);
+    }
 </script>
 
 <div class="vrv-legend">
@@ -35,7 +39,7 @@
             </div>
         </div>
         {#if root}
-            <TreeNode node={root} isRoot on:select={handleSelect} />
+            <TreeNode node={root} isRoot on:select={handleSelect} on:hover={handleHover} />
         {:else}
             <div class="vrv-tree-root"></div>
         {/if}

@@ -5,10 +5,18 @@
   export let node: TreeNodeData;
   export let isRoot = false;
 
-  const dispatch = createEventDispatcher<{ select: string }>();
+  const dispatch = createEventDispatcher<{ select: string; hover: string | null }>();
 
   function handleSelect() {
     dispatch('select', node.id);
+  }
+
+  function handleMouseEnter() {
+    dispatch('hover', node.id);
+  }
+
+  function handleMouseLeave() {
+    dispatch('hover', null);
   }
 </script>
 
@@ -24,13 +32,15 @@
     data-element={node.element}
     style={isRoot ? 'display: none;' : undefined}
     on:click|stopPropagation={handleSelect}
+    on:mouseenter={handleMouseEnter}
+    on:mouseleave={handleMouseLeave}
   >
     {node.element}
   </div>
   <div class="vrv-node-children">
     {#if node.children?.length}
       {#each node.children as child}
-        <svelte:self node={child} on:select />
+        <svelte:self node={child} on:select on:hover />
       {/each}
     {/if}
   </div>
