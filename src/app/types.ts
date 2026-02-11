@@ -1,34 +1,53 @@
 export type Mode = 'edit' | 'insert';
 
-export type SelectionInfo = {
-  type: 'none' | 'element';
-  label?: string;
-  id?: string;
+export interface SelectionInfo {
+    type: 'none' | 'element';
+    label?: string;
+    id?: string;
 };
 
-export type ViewModel = {
-  svg: string;
-  svgId: number;
-  selection: SelectionInfo;
+export interface ViewModel {
+    svg: string;
+    svgId: number;
+    selection: SelectionInfo;
 };
 
-export type EditorOp =
-    | { type: 'setContent'; text: string }
-    | { type: 'insertText'; text: string }
-    | { type: 'deleteBackward' }
-    | { type: 'setSelection'; selection: SelectionInfo };
-
-export type TreeNodeData = {
+export interface TreeNodeData {
     id: string;
     element: string;
     children?: TreeNodeData[];
     isLeaf?: boolean;
     attributes?: Record<string, unknown>;
-    appElId?: string;
 };
 
-export type Tab = {
+export interface Tab {
     label: string;
     value: number;
     component: any; // Replace with specific Svelte component type if available
 }
+
+export interface EditInfo {
+    chainedId: string;
+    canUndo: boolean;
+    canRedo: boolean;
+    isMensuralMusicOnly: boolean;
+}
+
+export interface ReferenceObject extends TreeNodeData {
+    referenceAttribute: string;
+}
+
+export interface EditInfoContent {
+    ancestors: TreeNodeData[];
+    context: TreeNodeData;
+    object: TreeNodeData;
+    referencedElements: ReferenceObject[];
+    referringElements: ReferenceObject[];
+}
+
+export type EditorAction = {
+    action: string;
+    param: {
+        elementId: string;
+    };
+};

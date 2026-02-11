@@ -1,3 +1,5 @@
+import type { EditInfoContent, EditInfo, EditorAction } from "../types";
+
 export type VerovioOptions = {
     adjustPageHeight: boolean;
     adjustPageWidth: boolean;
@@ -19,8 +21,8 @@ export type VerovioOptions = {
 };
 
 export type VerovioToolkit = {
-    edit: (mei: string) => string;
-    editInfo: () => string;
+    edit: (editorAction: EditorAction) => boolean;
+    editInfo: () => EditInfo | EditInfoContent;
     getAvailableOptions: () => string;
     getDefaultOptions: () => string;
     getElementAttr: (id: string) => string;

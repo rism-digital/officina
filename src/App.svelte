@@ -15,7 +15,7 @@
         viewModel,
         workerStatus,
     } from "./app/state";
-    import type { SelectionInfo, ViewModel } from "./app/types";
+    import type { EditInfoContent, EditorAction, SelectionInfo, TreeNodeData, ViewModel } from "./app/types";
     import type { Options as VerovioOptions } from "./app/worker/verovio-types";
 
     const VEROVIO_URL =
@@ -25,6 +25,7 @@
     let verovioVersion = "";
     const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
     let svgRenderId = 0;
+    let contextData: TreeNodeData | null = null;
 
     const worker = new Worker(
         new URL("./app/worker/worker.ts", import.meta.url),
@@ -176,11 +177,27 @@
     async function handleSelect(id: string | null) {
         if (!id) {
             await setSelection({ type: "none" });
+            contextData = null;
             return;
         }
         const page = await bridge.verovio.getPageWithElement(id);
         if (page && page > 0 && page !== get(verovioState).currentPage) {
             await setCurrentPage(page);
+        }
+        try {
+            const editorAction: EditorAction = {
+                    action: "context",
+                    param: { "elementId": id },
+                }
+            const contextOk = await bridge.verovio.edit(editorAction);
+            if (contextOk) {
+                contextData = (await bridge.verovio.editInfo() as EditInfoContent).context;
+            } else {
+                contextData = null;
+            }
+        } catch (error) {
+            console.error("Failed to load context data", error);
+            contextData = null;
         }
         await setSelection({
             type: "element",
@@ -229,13 +246,7 @@
     }
 </script>
 
-<input
-    class="vrv-file-input"
-    type="file"
-    accept=".mei,.xml"
-    bind:this={fileInput}
-    on:change={openFile}
-/>
+<input class="vrv-file-input" type="file" accept=".mei,.xml" bind:this={fileInput} on:change={openFile} />
 
 <div class="vrv-wrapper">
     <Menu
@@ -255,11 +266,7 @@
 
     <Toolbar mode={$mode} onToggleMode={toggleMode} />
 
-    <MainPanel
-        view={$viewModel}
-        onResize={applyLayoutForSize}
-        onElementSelect={handleSelect}
-    />
+    <MainPanel view={$viewModel} onResize={applyLayoutForSize} onElementSelect={handleSelect} {contextData} />
 
     <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
 </div>

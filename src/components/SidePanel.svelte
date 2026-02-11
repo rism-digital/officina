@@ -1,6 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import type { Tab } from "../app/types";
+    import type { Tab, TreeNodeData } from "../app/types";
 
     import ScoreTab from "./ScoreTab.svelte";
     import ContentTab from "./ContentTab.svelte";
@@ -11,6 +11,7 @@
     ];
 
     export let activeTabValue = 2;
+    export let contextData: { context?: TreeNodeData } | TreeNodeData | null = null;
 
     const dispatch = createEventDispatcher<{
         selectElement: string;
@@ -50,6 +51,7 @@
                             this={item.component}
                             on:selectElement={forwardSelect}
                             on:hoverElement={forwardHover}
+                            contextData={contextData}
                         />
                     </div>
                 {/if}

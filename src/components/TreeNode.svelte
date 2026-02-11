@@ -27,7 +27,6 @@
   class={isRoot ? "vrv-tree-root open" : `vrv-tree-node${node.isLeaf ? " leaf" : ""}`}
   data-id={node.id}
   data-element={node.element}
-  data-app-el-id={node.appElId}
 >
   <div
     class="vrv-mei-element vrv-node-label"

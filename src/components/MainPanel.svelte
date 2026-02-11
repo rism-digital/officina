@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
     import SidePanel from "./SidePanel.svelte";
-    import type { ViewModel } from "../app/types";
+    import type { TreeNodeData, ViewModel } from "../app/types";
 
     export let view: ViewModel;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: (id: string | null) => void;
+    export let contextData: { context?: TreeNodeData } | TreeNodeData | null = null;
 
     function forwardSelect(event: CustomEvent<string>) {
         onElementSelect?.(event.detail);
@@ -222,7 +223,11 @@
         <div class="vrv-filter" aria-hidden="true">{@html filterMarkup}</div>
     {/if}
     <div class="vrv-h-split">
-        <SidePanel on:selectElement={forwardSelect} on:hoverElement={forwardHover} />
+        <SidePanel
+            on:selectElement={forwardSelect}
+            on:hoverElement={forwardHover}
+            {contextData}
+        />
         <div class="vrv-v-split">
             <div class="vrv-verovio-view" bind:this={verovioView}>
                 <div class="vrv-svg-wrapper" bind:this={svgWrapper}>

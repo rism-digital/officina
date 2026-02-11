@@ -1,24 +1,12 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from "svelte";
+    import { createEventDispatcher } from "svelte";
     import TreeNode from "./TreeNode.svelte";
     import type { TreeNodeData } from "../app/types";
 
     const dispatch = createEventDispatcher<{ selectElement: string; hoverElement: string | null }>();
-    let root: TreeNodeData | null = null;
 
-    onMount(async () => {
-        try {
-            const response = await fetch("/test.json");
-            if (!response.ok) {
-                throw new Error(`Failed to load test.json: ${response.status}`);
-            }
-            const data = await response.json();
-            root = data.context ?? null;
-        } catch (error) {
-            console.error("Failed to load tree data", error);
-            root = null;
-        }
-    });
+    export let contextData: TreeNodeData | null = null;
+
     function handleSelect(event: CustomEvent<string>) {
         dispatch("selectElement", event.detail);
     }
@@ -38,8 +26,8 @@
                 <div class="vrv-tree-breadcrumb"></div>
             </div>
         </div>
-        {#if root}
-            <TreeNode node={root} isRoot on:select={handleSelect} on:hover={handleHover} />
+        {#if contextData}
+            <TreeNode node={contextData} isRoot on:select={handleSelect} on:hover={handleHover} />
         {:else}
             <div class="vrv-tree-root"></div>
         {/if}
