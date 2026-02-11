@@ -6,54 +6,54 @@ let seq = 0;
 type VerovioMethod = keyof VerovioToolkit;
 
 export type WorkerBridge = {
-  init: (verovioUrl: string) => Promise<void>;
-  call: <M extends VerovioMethod>(
-    method: M,
-    args?: Parameters<VerovioToolkit[M]>
-  ) => Promise<ReturnType<VerovioToolkit[M]>>;
-  verovio: {
-    [M in VerovioMethod]: (...args: Parameters<VerovioToolkit[M]>) => Promise<ReturnType<VerovioToolkit[M]>>;
-  };
+    init: (verovioUrl: string) => Promise<void>;
+    call: <M extends VerovioMethod>(
+        method: M,
+        args?: Parameters<VerovioToolkit[M]>
+    ) => Promise<ReturnType<VerovioToolkit[M]>>;
+    verovio: {
+        [M in VerovioMethod]: (...args: Parameters<VerovioToolkit[M]>) => Promise<ReturnType<VerovioToolkit[M]>>;
+    };
 };
 
 export function createWorkerBridge(worker: Worker): WorkerBridge {
-  const pending = new Map<string, { resolve: (value: any) => void; reject: (err: Error) => void }>();
+    const pending = new Map<string, { resolve: (value: any) => void; reject: (err: Error) => void }>();
 
-  worker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
-    const message = event.data;
-    const handler = pending.get(message.taskId);
-    if (!handler) return;
-    pending.delete(message.taskId);
-    handler.resolve(message.result);
-  });
-
-  function call<M extends VerovioMethod>(
-    method: M,
-    args?: Parameters<VerovioToolkit[M]>
-  ): Promise<ReturnType<VerovioToolkit[M]>> {
-    const taskId = `task_${seq++}`;
-    const payload: VerovioRequest = { taskId, method: String(method), args };
-    return new Promise((resolve, reject) => {
-      pending.set(taskId, { resolve, reject });
-      worker.postMessage(payload as WorkerRequest);
+    worker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
+        const message = event.data;
+        const handler = pending.get(message.taskId);
+        if (!handler) return;
+        pending.delete(message.taskId);
+        handler.resolve(message.result);
     });
-  }
 
-  const verovio = new Proxy(
-    {},
-    {
-      get(_target, prop: string) {
-        return (...args: unknown[]) => call(prop as VerovioMethod, args as never);
-      }
+    function call<M extends VerovioMethod>(
+        method: M,
+        args?: Parameters<VerovioToolkit[M]>
+    ): Promise<ReturnType<VerovioToolkit[M]>> {
+        const taskId = `task_${seq++}`;
+        const payload: VerovioRequest = { taskId, method: String(method), args };
+        return new Promise((resolve, reject) => {
+            pending.set(taskId, { resolve, reject });
+            worker.postMessage(payload as WorkerRequest);
+        });
     }
-  ) as WorkerBridge['verovio'];
 
-  return {
-    async init(verovioUrl: string) {
-      worker.postMessage({ verovioUrl } as WorkerRequest);
-      await call('onRuntimeInitialized');
-    },
-    call,
-    verovio
-  };
+    const verovio = new Proxy(
+        {},
+        {
+            get(_target, prop: string) {
+                return (...args: unknown[]) => call(prop as VerovioMethod, args as never);
+            }
+        }
+    ) as WorkerBridge['verovio'];
+
+    return {
+        async init(verovioUrl: string) {
+            worker.postMessage({ verovioUrl } as WorkerRequest);
+            await call('onRuntimeInitialized');
+        },
+        call,
+        verovio
+    };
 }

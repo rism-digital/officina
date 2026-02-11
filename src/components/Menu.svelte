@@ -1,85 +1,85 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher } from "svelte";
 
-  export let canZoom = false;
-  export let canZoomIn = true;
-  export let canZoomOut = true;
-  export let canGoPrev = false;
-  export let canGoNext = false;
+    export let canZoom = false;
+    export let canZoomIn = true;
+    export let canZoomOut = true;
+    export let canGoPrev = false;
+    export let canGoNext = false;
 
-  const dispatch = createEventDispatcher<{
-    open: void;
-    save: void;
-    export: void;
-    zoomIn: void;
-    zoomOut: void;
-    prevPage: void;
-    nextPage: void;
-  }>();
+    const dispatch = createEventDispatcher<{
+        open: void;
+        save: void;
+        export: void;
+        zoomIn: void;
+        zoomOut: void;
+        prevPage: void;
+        nextPage: void;
+    }>();
 </script>
 
 <nav class="vrv-toolbar vrv-text-no-select">
-  <div class="vrv-menu">
-    <div class="vrv-btn-text" data-before="File"></div>
-    <div class="vrv-menu-content">
-      <div class="vrv-v-separator"></div>
-      <div
-        class="vrv-menu-text"
-        data-before="Import MEI file"
-        on:click={() => dispatch("open")}
-      ></div>
-      <div class="vrv-v-separator"></div>
-      <div
-        class="vrv-menu-text"
-        data-before="Export MEI file"
-        on:click={() => dispatch("save")}
-      ></div>
-      <div
-        class="vrv-menu-text"
-        data-before="Export as SVG"
-        on:click={() => dispatch("export")}
-      ></div>
+    <div class="vrv-menu">
+        <div class="vrv-btn-text" data-before="File"></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Import MEI file"
+                on:click={() => dispatch("open")}
+            ></div>
+            <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Export MEI file"
+                on:click={() => dispatch("save")}
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Export as SVG"
+                on:click={() => dispatch("export")}
+            ></div>
+        </div>
     </div>
-  </div>
-  <div class="vrv-menu">
-    <div class="vrv-btn-text" data-before="Edit"></div>
-    <div class="vrv-menu-content">
-      <div class="vrv-v-separator"></div>
-      <div class="vrv-menu-text" data-before="Score properties"></div>
+    <div class="vrv-menu">
+        <div class="vrv-btn-text" data-before="Edit"></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-v-separator"></div>
+            <div class="vrv-menu-text" data-before="Score properties"></div>
+        </div>
     </div>
-  </div>
-  <div class="vrv-btn-group">
-    <div class="vrv-h-separator" />
-    <div
-      class:disabled={!canGoPrev}
-      class="vrv-btn-icon-left"
-      style="background-image: url('/icons/toolbar/arrow-left.png');"
-      data-before="Previous"
-      on:click={() => dispatch("prevPage")}
-    />
-    <div
-      class:disabled={!canGoNext}
-      class="vrv-btn-icon"
-      style="background-image: url('/icons/toolbar/arrow-right.png');"
-      data-before="Next"
-      on:click={() => dispatch("nextPage")}
-    />
-  </div>
-  <div class="vrv-btn-group">
-    <div class="vrv-h-separator" />
-    <div
-      class:disabled={!canZoom || !canZoomOut}
-      class="vrv-btn-icon-left"
-      style="background-image: url('/icons/toolbar/zoom-out.png');"
-      data-before="Zoom out"
-      on:click={() => dispatch("zoomOut")}
-    />
-    <div
-      class:disabled={!canZoom || !canZoomIn}
-      class="vrv-btn-icon"
-      style="background-image: url('/icons/toolbar/zoom-in.png');"
-      data-before="Zoom in"
-      on:click={() => dispatch("zoomIn")}
-    />
-  </div>
+    <div class="vrv-btn-group">
+        <div class="vrv-h-separator" />
+        <div
+            class:disabled={!canGoPrev}
+            class="vrv-btn-icon-left"
+            style="background-image: url('/icons/toolbar/arrow-left.png');"
+            data-before="Previous"
+            on:click={() => dispatch("prevPage")}
+        />
+        <div
+            class:disabled={!canGoNext}
+            class="vrv-btn-icon"
+            style="background-image: url('/icons/toolbar/arrow-right.png');"
+            data-before="Next"
+            on:click={() => dispatch("nextPage")}
+        />
+    </div>
+    <div class="vrv-btn-group">
+        <div class="vrv-h-separator" />
+        <div
+            class:disabled={!canZoom || !canZoomOut}
+            class="vrv-btn-icon-left"
+            style="background-image: url('/icons/toolbar/zoom-out.png');"
+            data-before="Zoom out"
+            on:click={() => dispatch("zoomOut")}
+        />
+        <div
+            class:disabled={!canZoom || !canZoomIn}
+            class="vrv-btn-icon"
+            style="background-image: url('/icons/toolbar/zoom-in.png');"
+            data-before="Zoom in"
+            on:click={() => dispatch("zoomIn")}
+        />
+    </div>
 </nav>
