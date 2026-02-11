@@ -53,10 +53,7 @@
         resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const { width, height } = entry.contentRect;
-                emitSize(
-                    Math.max(0, Math.floor(width)),
-                    Math.max(0, Math.floor(height)),
-                );
+                emitSize(Math.max(0, Math.floor(width)), Math.max(0, Math.floor(height)));
             }
         });
         resizeObserver.observe(verovioView);
@@ -80,25 +77,19 @@
             node.remove();
         });
 
-        svgOverlay
-            .querySelectorAll(".slur.bounding-box, .tie.bounding-box")
-            .forEach((node) => {
-                node.remove();
-            });
+        svgOverlay.querySelectorAll(".slur.bounding-box, .tie.bounding-box").forEach((node) => {
+            node.remove();
+        });
 
         // Make all elements transparent but still hittable
-        svgOverlay
-            .querySelectorAll("g, path, text, ellipse, polyline")
-            .forEach((node) => {
-                const element = node as SVGElement;
-                element.style.stroke = "transparent";
-                element.style.fill = "transparent";
-            });
+        svgOverlay.querySelectorAll("g, path, text, ellipse, polyline").forEach((node) => {
+            const element = node as SVGElement;
+            element.style.stroke = "transparent";
+            element.style.fill = "transparent";
+        });
 
         svgOverlay
-            .querySelectorAll(
-                ".slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path",
-            )
+            .querySelectorAll(".slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path")
             .forEach((node) => {
                 const element = node as SVGElement;
                 element.style.strokeWidth = "90";
@@ -138,16 +129,23 @@
         }
     }
 
-    function getClosestMEIElement(
-        node: Element | null,
-        elementType?: string,
-    ): SVGGElement | null {
+    function highlightWithColor(g: SVGElement, color: string) {
+        if (!g) return;
+        for (const node of Array.from(g.querySelectorAll("*:not(g)"))) {
+            const parent = node.parentNode as SVGElement;
+            // Do not highlight bounding box elements
+            if (parent.classList.contains("bounding-box")) continue;
+            const el = node as SVGElement;
+            el.style.fill = color;
+            el.style.stroke = color;
+        }
+    }
+
+    function getClosestMEIElement(node: Element | null, elementType?: string): SVGGElement | null {
         if (!node) return null;
 
         const isG = node.tagName?.toLowerCase() === "g";
-        const isBlocked =
-            node.classList.contains("bounding-box") ||
-            node.classList.contains("notehead");
+        const isBlocked = node.classList.contains("bounding-box") || node.classList.contains("notehead");
 
         if (!isG || isBlocked) {
             return getClosestMEIElement(node.parentElement, elementType);
@@ -164,22 +162,19 @@
         event.stopPropagation();
 
         // Clicking on the overlay - nothing to do
-        if (
-            <HTMLDivElement>(<HTMLElement>event.target).parentNode ===
-            svgOverlay
-        ) {
+        if (<HTMLDivElement>(<HTMLElement>event.target).parentNode === svgOverlay) {
             return;
         }
 
         // Get MEI element
-        let node: SVGGElement | null = getClosestMEIElement(
-            <SVGElement>event.target,
-        );
+        let node: SVGGElement | null = getClosestMEIElement(<SVGElement>event.target);
         if (!node || !node.id) {
             console.log(node, "MEI element not found or with no id");
             return; // this should never happen, but as a safety
         }
-        // console.log(node);
+
+        highlightWithColor(node, "#f00");
+
         onElementSelect?.(node.id);
     }
 
@@ -198,10 +193,7 @@
         <div class="vrv-filter" aria-hidden="true">{@html filterMarkup}</div>
     {/if}
     <div class="vrv-h-split">
-        <SidePanel
-            on:selectElement={forwardSelect}
-            on:hoverElement={forwardHover}
-        />
+        <SidePanel on:selectElement={forwardSelect} on:hoverElement={forwardHover} />
         <div class="vrv-v-split">
             <div class="vrv-verovio-view" bind:this={verovioView}>
                 <div class="vrv-svg-wrapper" bind:this={svgWrapper}>

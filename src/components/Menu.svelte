@@ -23,22 +23,10 @@
         <div class="vrv-btn-text" data-before="File"></div>
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
-            <div
-                class="vrv-menu-text"
-                data-before="Import MEI file"
-                on:click={() => dispatch("open")}
-            ></div>
+            <div class="vrv-menu-text" data-before="Import MEI file" on:click={() => dispatch("open")}></div>
             <div class="vrv-v-separator"></div>
-            <div
-                class="vrv-menu-text"
-                data-before="Export MEI file"
-                on:click={() => dispatch("save")}
-            ></div>
-            <div
-                class="vrv-menu-text"
-                data-before="Export as SVG"
-                on:click={() => dispatch("export")}
-            ></div>
+            <div class="vrv-menu-text" data-before="Export MEI file" on:click={() => dispatch("save")}></div>
+            <div class="vrv-menu-text" data-before="Export as SVG" on:click={() => dispatch("export")}></div>
         </div>
     </div>
     <div class="vrv-menu">
