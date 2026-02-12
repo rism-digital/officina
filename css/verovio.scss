@@ -1251,6 +1251,18 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             margin-top: $node-margin;
         }
 
+        .vrv-tree-node > .vrv-node-children {
+            display: none;
+        }
+
+        .vrv-tree-node.open > .vrv-node-children {
+            display: block;
+        }
+
+        .vrv-tree-root > .vrv-node-children {
+            display: block;
+        }
+
         .vrv-tree-node:not(.leaf)::before {
             cursor: pointer;
             position: absolute;

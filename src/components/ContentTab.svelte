@@ -7,6 +7,7 @@
     export let editInfoContent: EditInfoContent | null = null;
 
     let breadcrumbsWrapper: HTMLDivElement | null = null;
+    let treeRoot: HTMLDivElement | null = null;
 
     const dispatch = createEventDispatcher<{ selectElement: string; hoverElement: string | null }>();
 
@@ -27,6 +28,21 @@
 
     $: if (editInfoContent?.ancestors) {
         scrollBreadcrumbsToEnd();
+    }
+
+    async function scrollToSelectedNode(id: string) {
+        await tick();
+        if (!treeRoot) return;
+        const target = treeRoot.querySelector(`[data-id="${id}"]`) as HTMLElement | null;
+        if (!target) return;
+        const parentRect = treeRoot.getBoundingClientRect();
+        const childRect = target.getBoundingClientRect();
+        const offsetTop = childRect.top - parentRect.top + treeRoot.scrollTop;
+        treeRoot.scrollTo({ top: Math.max(offsetTop - 50, 0) });
+    }
+
+    $: if (editInfoContent?.object?.id) {
+        scrollToSelectedNode(editInfoContent?.object?.id);
     }
 </script>
 
@@ -50,17 +66,17 @@
                 {/if}
             </div>
         </div>
-        {#if editInfoContent && editInfoContent.context}
-            <TreeNode
-                node={editInfoContent.context}
-                isRoot
-                selectedId={editInfoContent.object?.id ?? null}
-                on:select={handleSelect}
-                on:hover={handleHover}
-            />
-        {:else}
-            <div class="vrv-tree-root"></div>
-        {/if}
+        <div class="vrv-tree-root" bind:this={treeRoot}>
+            {#if editInfoContent && editInfoContent.context}
+                <TreeNode
+                    node={editInfoContent.context}
+                    isRoot
+                    selectedId={editInfoContent.object?.id ?? null}
+                    on:select={handleSelect}
+                    on:hover={handleHover}
+                />
+            {/if}
+        </div>
     </div>
 </div>
 

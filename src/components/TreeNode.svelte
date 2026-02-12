@@ -6,10 +6,22 @@
     export let isRoot = false;
     export let selectedId: string | null = null;
 
+    let htmlTreeNode: HTMLDivElement | null = null;
+
     const dispatch = createEventDispatcher<{
         select: string;
         hover: string | null;
     }>();
+
+    function handleOpenClose() {
+        if (!htmlTreeNode) return;
+        if (htmlTreeNode.classList.contains("open")) {
+            htmlTreeNode.classList.remove("open");
+        } else {
+            htmlTreeNode.classList.add("open");
+            handleSelect();
+        }
+    }
 
     function handleSelect() {
         dispatch("select", node.id);
@@ -25,9 +37,13 @@
 </script>
 
 <div
-    class={isRoot ? "vrv-tree-root open" : `vrv-tree-node${node.isLeaf ? " leaf" : ""}`}
+    class={isRoot
+        ? "vrv-tree-root open"
+        : `vrv-tree-node${node.isLeaf ? " leaf" : ""} ${node.children?.length ? " open" : ""}`}
     data-id={node.id}
     data-element={node.element}
+    on:click|stopPropagation={handleOpenClose}
+    bind:this={htmlTreeNode}
 >
     <div
         class="vrv-mei-element vrv-node-label {node.id === selectedId ? 'target checked' : ''}"

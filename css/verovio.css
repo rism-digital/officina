@@ -803,6 +803,12 @@
       margin-left: 16px;
       min-height: 22px;
       margin-top: 4px; }
+    .vrv-wrapper .vrv-tree-root .vrv-tree-node > .vrv-node-children {
+      display: none; }
+    .vrv-wrapper .vrv-tree-root .vrv-tree-node.open > .vrv-node-children {
+      display: block; }
+    .vrv-wrapper .vrv-tree-root .vrv-tree-root > .vrv-node-children {
+      display: block; }
     .vrv-wrapper .vrv-tree-root .vrv-tree-node:not(.leaf)::before {
       cursor: pointer;
       position: absolute;
