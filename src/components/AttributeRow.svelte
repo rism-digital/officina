@@ -4,6 +4,7 @@
     export let optionsAll: string[] | null = null;
     export let optionsBasic: string[] | null = null;
     export let readOnly = false;
+    export let customOptions: string[] | null = null;
 
     $: filteredAll = optionsAll && optionsBasic
         ? optionsAll.filter((opt) => !optionsBasic.includes(opt))
@@ -22,7 +23,14 @@
 <tr class="vrv-attribute-item">
     <td class="vrv-attribute-name">{name}</td>
     <td class="vrv-attribute-value">
-        {#if hasOptions}
+        {#if customOptions}
+            <select class="vrv-form-input {readOnly ? 'disabled' : ''}" disabled={readOnly}>
+                <option value=""></option>
+                {#each renderOptions(customOptions, value) as opt}
+                    <option value={opt.value} selected={opt.selected}>{opt.value}</option>
+                {/each}
+            </select>
+        {:else if hasOptions}
             <select class="vrv-form-input {readOnly ? 'disabled' : ''}" disabled={readOnly}>
                 <option value=""></option>
                 {#if optionsBasic && filteredAll.length > 0}

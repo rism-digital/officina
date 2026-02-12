@@ -44,6 +44,16 @@
         /(staff|layer)@n$/,
     ];
 
+    const customAllPname = ["c", "d", "e", "f", "g", "a", "b"];
+
+    function customOptionsFor(attrName: string) {
+        const input = `${elementName}@${attrName}`;
+        if (/^.*@pname$/.test(input)) {
+            return customAllPname;
+        }
+        return null;
+    }
+
     function isReadOnly(attrName: string) {
         const input = `${elementName}@${attrName}`;
         return readOnlyPatterns.some((pattern) => pattern.test(input));
@@ -74,6 +84,7 @@
                     optionsAll={allAttrs?.[name] ?? null}
                     optionsBasic={basicAttrs?.[name] ?? null}
                     readOnly={isReadOnly(name)}
+                    customOptions={customOptionsFor(name)}
                 />
             {/each}
             <tr>
@@ -94,6 +105,7 @@
                         optionsAll={allAttrs?.[name] ?? null}
                         optionsBasic={basicAttrs?.[name] ?? null}
                         readOnly={isReadOnly(name)}
+                        customOptions={customOptionsFor(name)}
                     />
                 {/each}
                 <tr>
@@ -115,6 +127,7 @@
                         optionsAll={allAttrs?.[name] ?? null}
                         optionsBasic={basicAttrs?.[name] ?? null}
                         readOnly={isReadOnly(name)}
+                        customOptions={customOptionsFor(name)}
                     />
                 {/each}
             </tbody>
