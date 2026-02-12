@@ -2,11 +2,14 @@
     import { onDestroy, onMount, tick } from "svelte";
     import SidePanel from "./SidePanel.svelte";
     import type { EditInfoContent, ViewModel } from "../app/types";
+    import type { RNGLoader } from "../app/rng-loader";
 
     export let view: ViewModel;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: (id: string | null) => void;
     export let editInfoContent: EditInfoContent| null = null;
+    export let rngMEIAll: RNGLoader | null = null;
+    export let rngMEIBasic: RNGLoader | null = null;
 
     function forwardSelect(event: CustomEvent<string>) {
         onElementSelect?.(event.detail);
@@ -228,6 +231,8 @@
             on:selectElement={forwardSelect}
             on:hoverElement={forwardHover}
             {editInfoContent}
+            {rngMEIAll}
+            {rngMEIBasic}
         />
         <div class="vrv-v-split">
             <div class="vrv-verovio-view" bind:this={verovioView}>

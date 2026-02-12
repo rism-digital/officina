@@ -37,7 +37,7 @@ export class RNGLoader {
     // Getters and setters
     //////////////////////////////////////////////////////////////////////////////
 
-    public getTags(): Record<string, unknown> { return this.tags; }
+    public getTags(): ElementsMap { return this.tags as ElementsMap; }
 
     //////////////////////////////////////////////////////////////////////////////
     // schemaInfoCreator
@@ -299,11 +299,11 @@ export class RNGLoader {
     }
 }
 
-type ElementDef = {
+export type ElementDef = {
     attrs: Record<string, Array<string>>;
     children: Array<string>;
     types: Record<string, string>;
     text?: boolean;
 };
 
-type ElementsMap = Record<string, ElementDef | Array<string>>;
+export type ElementsMap = Record<string, ElementDef | Array<string>>;

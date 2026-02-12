@@ -3,6 +3,7 @@
     import ContentTab from "./ContentTab.svelte";
     import ScoreTab from "./ScoreTab.svelte";
     import type { EditInfoContent, Tab } from "../app/types";
+    import type { RNGLoader } from "../app/rng-loader";
 
     export const items: Tab[] = [
         { label: "Score", value: 1, component: ScoreTab },
@@ -11,6 +12,8 @@
 
     export let activeTabValue = 2;
     export let editInfoContent: EditInfoContent | null = null;
+    export let rngMEIAll: RNGLoader | null = null;
+    export let rngMEIBasic: RNGLoader | null = null;
 
     const dispatch = createEventDispatcher<{
         selectElement: string;
@@ -53,6 +56,8 @@
                             on:selectElement={forwardSelect}
                             on:hoverElement={forwardHover}
                             editInfoContent={editInfoContent}
+                            {rngMEIAll}
+                            {rngMEIBasic}
                         />
                     </div>
                 {/if}

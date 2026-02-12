@@ -2,9 +2,13 @@
     import { createEventDispatcher, tick } from "svelte";
     import TreeCrumb from "./TreeCrumb.svelte";
     import TreeNode from "./TreeNode.svelte";
+    import AttributeList from "./AttributeList.svelte";
     import type { EditInfoContent } from "../app/types";
+    import type { RNGLoader } from "../app/rng-loader";
 
     export let editInfoContent: EditInfoContent | null = null;
+    export let rngMEIAll: RNGLoader | null = null;
+    export let rngMEIBasic: RNGLoader | null = null;
 
     let breadcrumbsWrapper: HTMLDivElement | null = null;
     let treeRoot: HTMLDivElement | null = null;
@@ -85,9 +89,7 @@
 </div>
 <div class="vrv-field-set" style="flex-grow: 3;">
     <div class="vrv-field-set-panel" style="display: flex;">
-        <div class="vrv-attribute-list-wrapper">
-            <div class="vrv-attribute-filter"></div>
-        </div>
+        <AttributeList {editInfoContent} {rngMEIAll} {rngMEIBasic} />
     </div>
 </div>
 <div class="vrv-legend">

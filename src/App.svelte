@@ -292,7 +292,14 @@
 
     <Toolbar mode={$mode} onToggleMode={toggleMode} />
 
-    <MainPanel view={$viewModel} onResize={applyLayoutForSize} onElementSelect={handleSelect} {editInfoContent} />
+    <MainPanel
+        view={$viewModel}
+        onResize={applyLayoutForSize}
+        onElementSelect={handleSelect}
+        {editInfoContent}
+        {rngMEIAll}
+        {rngMEIBasic}
+    />
 
     <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
 </div>
