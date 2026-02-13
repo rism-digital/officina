@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { createEventDispatcher, tick } from "svelte";
-    import TreeCrumb from "./TreeCrumb.svelte";
-    import TreeNode from "./TreeNode.svelte";
+    import { createEventDispatcher } from "svelte";
     import AttributeList from "./AttributeList.svelte";
+    import Tree from "./Tree.svelte";
     import type { EditInfoContent } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
@@ -10,8 +9,6 @@
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
 
-    let breadcrumbsWrapper: HTMLDivElement | null = null;
-    let treeRoot: HTMLDivElement | null = null;
     let closedSections = {
         structure: false,
         attributes: false,
@@ -24,40 +21,12 @@
         hoverElement: string | null;
     }>();
 
-    function handleSelect(event: CustomEvent<string>) {
+    function forwardSelect(event: CustomEvent<string>) {
         dispatch("selectElement", event.detail);
     }
 
-    function handleHover(event: CustomEvent<string | null>) {
+    function forwardHover(event: CustomEvent<string | null>) {
         dispatch("hoverElement", event.detail);
-    }
-
-    async function scrollBreadcrumbsToEnd() {
-        await tick();
-        if (breadcrumbsWrapper) {
-            breadcrumbsWrapper.scrollLeft = breadcrumbsWrapper.scrollWidth;
-        }
-    }
-
-    $: if (editInfoContent?.ancestors) {
-        scrollBreadcrumbsToEnd();
-    }
-
-    async function scrollToSelectedNode(id: string) {
-        await tick();
-        if (!treeRoot) return;
-        const target = treeRoot.querySelector(
-            `[data-id="${id}"]`,
-        ) as HTMLElement | null;
-        if (!target) return;
-        const parentRect = treeRoot.getBoundingClientRect();
-        const childRect = target.getBoundingClientRect();
-        const offsetTop = childRect.top - parentRect.top + treeRoot.scrollTop;
-        treeRoot.scrollTo({ top: Math.max(offsetTop - 50, 0) });
-    }
-
-    $: if (editInfoContent?.object?.id) {
-        scrollToSelectedNode(editInfoContent?.object?.id);
     }
 
     function toggleSection(key: keyof typeof closedSections) {
@@ -77,35 +46,13 @@
     style="flex-grow: 3;"
 >
     <div class="vrv-field-set-panel" style="display: flex;">
-        <div
-            class="vrv-tree-breadcrumbs-wrapper"
-            bind:this={breadcrumbsWrapper}
-        >
-            <div class="vrv-tree-breadcrumbs">
-                <div class="vrv-tree-breadcrumb" />
-                {#if editInfoContent && editInfoContent.ancestors}
-                    {#each editInfoContent.ancestors.reverse() as ancestor}
-                        <TreeCrumb
-                            id={ancestor.id}
-                            label={ancestor.element}
-                            on:select={handleSelect}
-                            on:hover={handleHover}
-                        />
-                    {/each}
-                {/if}
-            </div>
-        </div>
-        <div class="vrv-tree-root" bind:this={treeRoot}>
-            {#if editInfoContent && editInfoContent.context}
-                <TreeNode
-                    node={editInfoContent.context}
-                    isRoot
-                    selectedId={editInfoContent.object?.id ?? null}
-                    on:select={handleSelect}
-                    on:hover={handleHover}
-                />
-            {/if}
-        </div>
+        <Tree
+            ancestors={editInfoContent?.ancestors ?? null}
+            context={editInfoContent?.context ?? null}
+            selectedId={editInfoContent?.object?.id ?? null}
+            on:selectElement={forwardSelect}
+            on:hoverElement={forwardHover}
+        />
     </div>
 </div>
 
