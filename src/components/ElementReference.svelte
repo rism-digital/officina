@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import type { ReferenceObject } from "../app/types";
+    import { iconFor } from "../app/icons";
 
     export let references: ReferenceObject[] | null = null;
     export let direction: "from" | "to" = "from";
@@ -31,6 +32,7 @@
                 data-id={reference.id}
                 data-element={reference.element}
                 data-before={direction === "to" ? "← " : "→ "}
+                style={`background-image: url("${iconFor(reference.element)}");`}
                 on:click={() => handleClick(reference.id)}
                 on:mouseenter={() => handleMouseEnter(reference.id)}
                 on:mouseleave={handleMouseLeave}

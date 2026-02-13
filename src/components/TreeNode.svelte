@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import type { TreeNodeData } from "../app/types";
+    import { iconFor } from "../app/icons";
 
     export let node: TreeNodeData;
     export let isRoot = false;
@@ -49,7 +50,7 @@
         class="vrv-mei-element vrv-node-label {node.id === selectedId ? 'target checked' : ''}"
         data-id={node.id}
         data-element={node.element}
-        style={isRoot ? "display: none;" : undefined}
+        style={`background-image: url("${iconFor(node.element)}");${isRoot ? " display: none;" : ""}`}
         on:click|stopPropagation={handleSelect}
         on:mouseenter={handleMouseEnter}
         on:mouseleave={handleMouseLeave}
