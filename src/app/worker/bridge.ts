@@ -1,5 +1,24 @@
-import type { VerovioRequest, WorkerRequest, WorkerResponse } from './messages';
-import type { VerovioToolkit } from './verovio-types';
+import type { VerovioToolkit } from "./verovio-types";
+
+export type VerovioInitMessage = {
+    verovioUrl: string;
+};
+
+export type VerovioRequest = {
+    taskId: string;
+    method: string;
+    args?: unknown[];
+};
+
+export type WorkerRequest = VerovioInitMessage | VerovioRequest;
+
+export type WorkerResponse = {
+    taskId: string;
+    method: string;
+    args?: unknown[];
+    result: unknown;
+};
+
 
 let seq = 0;
 
@@ -17,7 +36,10 @@ export type WorkerBridge = {
 };
 
 export function createWorkerBridge(worker: Worker): WorkerBridge {
-    const pending = new Map<string, { resolve: (value: any) => void; reject: (err: Error) => void }>();
+    const pending = new Map<
+        string,
+        { resolve: (value: any) => void; reject: (err: Error) => void }
+    >();
 
     worker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
         const message = event.data;
@@ -43,10 +65,11 @@ export function createWorkerBridge(worker: Worker): WorkerBridge {
         {},
         {
             get(_target, prop: string) {
-                return (...args: unknown[]) => call(prop as VerovioMethod, args as never);
-            }
-        }
-    ) as WorkerBridge['verovio'];
+                return (...args: unknown[]) =>
+                    call(prop as VerovioMethod, args as never);
+            },
+        },
+    ) as WorkerBridge["verovio"];
 
     return {
         async init(verovioUrl: string) {

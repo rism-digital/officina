@@ -24,6 +24,7 @@
     const MEI_ALL_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-all.rng";
     const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
+    
     let fileInput: HTMLInputElement | null = null;
     let verovioVersion = "";
     const zoomLevels = [10, 20, 35, 75, 100, 150, 200];

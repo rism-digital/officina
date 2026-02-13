@@ -1,16 +1,7 @@
+import type { WorkerRequest, WorkerResponse } from "./bridge";
+
 declare const verovio: any;
 let verovioToolkit: any;
-
-type WorkerRequest =
-    | { verovioUrl: string }
-    | { taskId: string; method: string; args?: unknown[] };
-
-type WorkerResponse = {
-    taskId: string;
-    method: string;
-    args?: unknown[];
-    result: unknown;
-};
 
 const isVerovioModuleReady = (() => {
     let resolve: (value: null) => void;
