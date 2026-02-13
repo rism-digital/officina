@@ -782,6 +782,12 @@
       overflow: scroll; }
   .vrv-wrapper .vrv-field-set.toggled {
     display: none; }
+  .vrv-wrapper .vrv-legend.vrv-collapsible.close > .icon {
+    transform: rotate(90deg); }
+  .vrv-wrapper .vrv-field-set.vrv-collapsible.close {
+    display: none; }
+  .vrv-wrapper .vrv-field-set.vrv-collapsible {
+    display: flex; }
   .vrv-wrapper .vrv-tree-root {
     overflow-y: auto; }
     .vrv-wrapper .vrv-tree-root .vrv-node-label {

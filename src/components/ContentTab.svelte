@@ -12,8 +12,17 @@
 
     let breadcrumbsWrapper: HTMLDivElement | null = null;
     let treeRoot: HTMLDivElement | null = null;
+    let closedSections = {
+        structure: false,
+        attributes: false,
+        referencing: false,
+        referenced: false,
+    };
 
-    const dispatch = createEventDispatcher<{ selectElement: string; hoverElement: string | null }>();
+    const dispatch = createEventDispatcher<{
+        selectElement: string;
+        hoverElement: string | null;
+    }>();
 
     function handleSelect(event: CustomEvent<string>) {
         dispatch("selectElement", event.detail);
@@ -37,7 +46,9 @@
     async function scrollToSelectedNode(id: string) {
         await tick();
         if (!treeRoot) return;
-        const target = treeRoot.querySelector(`[data-id="${id}"]`) as HTMLElement | null;
+        const target = treeRoot.querySelector(
+            `[data-id="${id}"]`,
+        ) as HTMLElement | null;
         if (!target) return;
         const parentRect = treeRoot.getBoundingClientRect();
         const childRect = target.getBoundingClientRect();
@@ -48,14 +59,28 @@
     $: if (editInfoContent?.object?.id) {
         scrollToSelectedNode(editInfoContent?.object?.id);
     }
+
+    function toggleSection(key: keyof typeof closedSections) {
+        closedSections = { ...closedSections, [key]: !closedSections[key] };
+    }
 </script>
 
-<div class="vrv-legend">
-    Score structure<span class="icon">▼</span>
+<div class="vrv-legend vrv-collapsible" class:close={closedSections.structure}>
+    Score structure<span
+        class="icon"
+        on:click={() => toggleSection("structure")}>▼</span
+    >
 </div>
-<div class="vrv-field-set" style="flex-grow: 3;">
+<div
+    class="vrv-field-set vrv-collapsible"
+    class:close={closedSections.structure}
+    style="flex-grow: 3;"
+>
     <div class="vrv-field-set-panel" style="display: flex;">
-        <div class="vrv-tree-breadcrumbs-wrapper" bind:this={breadcrumbsWrapper}>
+        <div
+            class="vrv-tree-breadcrumbs-wrapper"
+            bind:this={breadcrumbsWrapper}
+        >
             <div class="vrv-tree-breadcrumbs">
                 <div class="vrv-tree-breadcrumb" />
                 {#if editInfoContent && editInfoContent.ancestors}
@@ -84,26 +109,43 @@
     </div>
 </div>
 
-<div class="vrv-legend">
-    Attributes or text<span class="icon">▼</span>
+<div class="vrv-legend vrv-collapsible" class:close={closedSections.attributes}>
+    Attributes or text<span
+        class="icon"
+        on:click={() => toggleSection("attributes")}>▼</span
+    >
 </div>
-<div class="vrv-field-set" style="flex-grow: 3;">
+<div
+    class="vrv-field-set vrv-collapsible"
+    class:close={closedSections.attributes}
+    style="flex-grow: 3;"
+>
     <div class="vrv-field-set-panel" style="display: flex;">
         <AttributeList {editInfoContent} {rngMEIAll} {rngMEIBasic} />
     </div>
 </div>
-<div class="vrv-legend">
-    Referencing elements<span class="icon">▼</span>
+
+<div class="vrv-legend vrv-collapsible" class:close={closedSections.referencing}>
+    Referencing elements<span
+        class="icon"
+        on:click={() => toggleSection("referencing")}>▼</span
+    >
 </div>
-<div class="vrv-field-set">
+
+<div class="vrv-field-set vrv-collapsible" class:close={closedSections.referencing}>
     <div class="vrv-field-set-panel" style="display: flex;">
         <div class="vrv-reference-list-wrapper"></div>
     </div>
 </div>
-<div class="vrv-legend">
-    Referenced elements<span class="icon">▼</span>
+
+<div class="vrv-legend vrv-collapsible" class:close={closedSections.referenced}>
+    Referenced elements<span
+        class="icon"
+        on:click={() => toggleSection("referenced")}>▼</span
+    >
 </div>
-<div class="vrv-field-set">
+
+<div class="vrv-field-set vrv-collapsible" class:close={closedSections.referenced}>
     <div class="vrv-field-set-panel">
         <div class="vrv-reference-list-wrapper"></div>
     </div>

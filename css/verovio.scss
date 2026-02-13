@@ -1207,6 +1207,18 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         display: none;
     }
 
+    .vrv-legend.vrv-collapsible.close > .icon {
+        transform: rotate(90deg);
+    }
+
+    .vrv-field-set.vrv-collapsible.close {
+        display: none;
+    }
+
+    .vrv-field-set.vrv-collapsible {
+        display: flex;
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Tree
     ////////////////////////////////////////////////////////////////////////
