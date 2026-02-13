@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import AttributeList from "./AttributeList.svelte";
+    import ElementReference from "./ElementReference.svelte";
     import Tree from "./Tree.svelte";
     import type { EditInfoContent } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
@@ -81,7 +82,12 @@
 
 <div class="vrv-field-set vrv-collapsible" class:close={closedSections.referencing}>
     <div class="vrv-field-set-panel" style="display: flex;">
-        <div class="vrv-reference-list-wrapper"></div>
+        <ElementReference
+            references={editInfoContent?.referringElements ?? null}
+            direction="to"
+            on:selectElement={forwardSelect}
+            on:hoverElement={forwardHover}
+        />
     </div>
 </div>
 
@@ -94,6 +100,11 @@
 
 <div class="vrv-field-set vrv-collapsible" class:close={closedSections.referenced}>
     <div class="vrv-field-set-panel">
-        <div class="vrv-reference-list-wrapper"></div>
+        <ElementReference
+            references={editInfoContent?.referencedElements ?? null}
+            direction="from"
+            on:selectElement={forwardSelect}
+            on:hoverElement={forwardHover}
+        />
     </div>
 </div>
