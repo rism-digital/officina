@@ -5,12 +5,21 @@
     export let optionsBasic: string[] | null = null;
     export let readOnly = false;
     export let customOptions: string[] | null = null;
+    export let attributeType: string | null = null;
 
     $: filteredAll = optionsAll && optionsBasic
         ? optionsAll.filter((opt) => !optionsBasic.includes(opt))
         : optionsAll ?? [];
 
     $: hasOptions = (optionsBasic && optionsBasic.length > 0) || filteredAll.length > 0;
+
+    $: numericInput = attributeType === "positiveInteger"
+        ? { type: "number", min: "1", step: "1" }
+        : attributeType === "nonNegativeInteger"
+            ? { type: "number", min: "0", step: "1" }
+            : attributeType === "decimal"
+                ? { type: "number", step: "0.1" }
+                : null;
 
     function renderOptions(values: string[], selected: string) {
         return values.map((opt) => ({
@@ -51,7 +60,14 @@
                 {/if}
             </select>
         {:else}
-            <input class="vrv-form-input {readOnly ? 'disabled' : ''}" value={value} disabled={readOnly} />
+            <input
+                class="vrv-form-input {readOnly ? 'disabled' : ''}"
+                value={value}
+                disabled={readOnly}
+                type={numericInput?.type}
+                min={numericInput?.min}
+                step={numericInput?.step}
+            />
         {/if}
     </td>
 </tr>

@@ -27,6 +27,9 @@
         elementName && rngMEIBasic ? rngMEIBasic.getTags()[elementName] : null;
     $: allAttrs = isElementDef(allTags) ? allTags.attrs : {};
     $: basicAttrs = isElementDef(basicTags) ? basicTags.attrs : {};
+    $: allTypes = isElementDef(allTags) ? allTags.types : {};
+    $: basicTypes = isElementDef(basicTags) ? basicTags.types : {};
+    $: typeFor = (name: string) => basicTypes?.[name] ?? allTypes?.[name] ?? null;
     $: usedNames = new Set(Object.keys(attributes));
     $: basicNames = Object.keys(basicAttrs).filter(
         (name) => !usedNames.has(name),
@@ -86,6 +89,7 @@
                     value={String(value)}
                     optionsAll={allAttrs?.[name] ?? null}
                     optionsBasic={basicAttrs?.[name] ?? null}
+                    attributeType={typeFor(name)}
                     readOnly={isReadOnly(name)}
                     customOptions={customOptionsFor(name)}
                 />
@@ -107,6 +111,7 @@
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
                         optionsBasic={basicAttrs?.[name] ?? null}
+                        attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
                     />
@@ -129,6 +134,7 @@
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
                         optionsBasic={basicAttrs?.[name] ?? null}
+                        attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
                     />
