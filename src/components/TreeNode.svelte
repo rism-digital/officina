@@ -55,8 +55,8 @@
         on:mouseenter={handleMouseEnter}
         on:mouseleave={handleMouseLeave}
     >
-        {node.element}
-    </div>
+        {node.element} {node.attributes?.["n"] ? `${node.attributes["n"]}` : ""}
+     </div>
     <div class="vrv-node-children">
         {#if node.children?.length}
             {#each node.children as child}
