@@ -3,7 +3,7 @@
     import AttributeList from "./AttributeList.svelte";
     import ElementReference from "./ElementReference.svelte";
     import Tree from "./Tree.svelte";
-    import type { EditInfoContent } from "../app/types";
+    import type { AttributeEdit, EditInfoContent } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let editInfoContent: EditInfoContent | null = null;
@@ -20,6 +20,7 @@
     const dispatch = createEventDispatcher<{
         selectElement: string;
         hoverElement: string | null;
+        editAttribute: AttributeEdit;
     }>();
 
     function forwardSelect(event: CustomEvent<string>) {
@@ -28,6 +29,10 @@
 
     function forwardHover(event: CustomEvent<string | null>) {
         dispatch("hoverElement", event.detail);
+    }
+
+    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
+        dispatch("editAttribute", event.detail);
     }
 
     function toggleSection(key: keyof typeof closedSections) {
@@ -69,7 +74,12 @@
     style="flex-grow: 3;"
 >
     <div class="vrv-field-set-panel" style="display: flex;">
-        <AttributeList {editInfoContent} {rngMEIAll} {rngMEIBasic} />
+        <AttributeList
+            {editInfoContent}
+            {rngMEIAll}
+            {rngMEIBasic}
+            on:editAttribute={forwardEditAttribute}
+        />
     </div>
 </div>
 

@@ -16,7 +16,7 @@
         viewModel,
         workerStatus,
     } from "./app/state";
-    import type { EditInfoContent, EditorAction, SelectionInfo } from "./app/types";
+    import type { AttributeEdit, EditActionParamSet, EditInfoContent, EditorAction, SelectionInfo } from "./app/types";
     import type { Options as VerovioOptions } from "./app/worker/verovio-types";
 
     const VEROVIO_URL =
@@ -113,6 +113,15 @@
         svgRenderId += 1;
         viewModel.set({ ...current, svg, svgId: svgRenderId });
         workerStatus.set("idle");
+    }
+
+    async function applyEditLayout(commit: boolean) {
+        if (commit) {
+            await bridge.verovio.edit({ action: "commit", param: {} });
+        } else {
+            await bridge.verovio.redoPagePitchPosLayout();
+        }
+        await updateVerovioView();
     }
 
     async function setCurrentPage(nextPage: number) {
@@ -232,6 +241,31 @@
         });
     }
 
+    async function handleAttributeEdit(edit: AttributeEdit) {
+        workerStatus.set("busy");
+        try {
+            const editActionParam: EditActionParamSet = {
+                elementId: edit.elementId,
+                attribute: edit.attName,
+                value: edit.attValue,
+            };
+            const editorAction: EditorAction = {
+                action: "set",
+                param: editActionParam,
+            };
+            const ok = await bridge.verovio.edit(editorAction);
+            if (ok) {
+                editInfoContent = await bridge.verovio.editInfo() as EditInfoContent;
+                await applyEditLayout(edit.commit);
+            } else {
+                workerStatus.set("idle");
+            }
+        } catch (error) {
+            console.error("Failed to update attribute", error);
+            workerStatus.set("idle");
+        }
+    }
+
     function toggleMode() {
         mode.update((current) => (current === "insert" ? "edit" : "insert"));
     }
@@ -297,6 +331,7 @@
         view={$viewModel}
         onResize={applyLayoutForSize}
         onElementSelect={handleSelect}
+        onAttributeEdit={handleAttributeEdit}
         {editInfoContent}
         {rngMEIAll}
         {rngMEIBasic}

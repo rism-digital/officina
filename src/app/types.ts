@@ -46,9 +46,20 @@ export interface EditInfoContent {
     referringElements: ReferenceObject[];
 }
 
+export type AttributeEdit = {
+    elementId: string;
+    attName: string;
+    attValue: string;
+    commit: boolean;
+};
+
+export type EditActionParamSet = {
+    elementId: string;
+    attribute: string;
+    value: string;
+}
+
 export type EditorAction = {
-    action: string;
-    param: {
-        elementId: string;
-    };
+    action: "commit" | "context" | "set";
+    param?: EditActionParamSet | {};
 };

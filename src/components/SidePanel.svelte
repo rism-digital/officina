@@ -2,7 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import ContentTab from "./ContentTab.svelte";
     import ScoreTab from "./ScoreTab.svelte";
-    import type { EditInfoContent, Tab } from "../app/types";
+    import type { AttributeEdit, EditInfoContent, Tab } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export const items: Tab[] = [
@@ -18,6 +18,7 @@
     const dispatch = createEventDispatcher<{
         selectElement: string;
         hoverElement: string | null;
+        editAttribute: AttributeEdit;
     }>();
 
     function forwardSelect(event: CustomEvent<string>) {
@@ -26,6 +27,10 @@
     
     function forwardHover(event: CustomEvent<string | null>) {
         dispatch("hoverElement", event.detail);
+    }
+
+    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
+        dispatch("editAttribute", event.detail);
     }
 
     const handleClick = (tabValue: number) => () => {
@@ -55,6 +60,7 @@
                             this={item.component}
                             on:selectElement={forwardSelect}
                             on:hoverElement={forwardHover}
+                            on:editAttribute={forwardEditAttribute}
                             editInfoContent={editInfoContent}
                             {rngMEIAll}
                             {rngMEIBasic}

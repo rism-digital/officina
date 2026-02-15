@@ -1,11 +1,16 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
     import AttributeRow from "./AttributeRow.svelte";
-    import type { EditInfoContent } from "../app/types";
+    import type { AttributeEdit, EditInfoContent } from "../app/types";
     import type { ElementDef, RNGLoader } from "../app/rng-loader";
 
     export let editInfoContent: EditInfoContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
+
+    const dispatch = createEventDispatcher<{
+        editAttribute: AttributeEdit;
+    }>();
 
     $: elementName = editInfoContent?.object?.element ?? "";
     $: attributes = {
@@ -74,6 +79,10 @@
         showAll = !showAll;
         if (showAll) showBasic = true;
     }
+
+    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
+        dispatch("editAttribute", event.detail);
+    }
 </script>
 
 <div class="vrv-attribute-list-wrapper">
@@ -85,6 +94,7 @@
         <tbody>
             {#each Object.entries(attributes) as [name, value]}
                 <AttributeRow
+                    elementId={editInfoContent?.object?.id ?? null}
                     {name}
                     value={String(value)}
                     optionsAll={allAttrs?.[name] ?? null}
@@ -92,6 +102,7 @@
                     attributeType={typeFor(name)}
                     readOnly={isReadOnly(name)}
                     customOptions={customOptionsFor(name)}
+                    on:editAttribute={forwardEditAttribute}
                 />
             {/each}
             <tr>
@@ -107,6 +118,7 @@
             <tbody style="display: {showBasic ? 'table-row-group' : 'none'};">
                 {#each basicNames as name}
                     <AttributeRow
+                        elementId={editInfoContent?.object?.id ?? null}
                         {name}
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
@@ -114,6 +126,7 @@
                         attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
+                        on:editAttribute={forwardEditAttribute}
                     />
                 {/each}
                 <tr>
@@ -130,6 +143,7 @@
             <tbody style="display: {showAll ? 'table-row-group' : 'none'};">
                 {#each allNames as name}
                     <AttributeRow
+                        elementId={editInfoContent?.object?.id ?? null}
                         {name}
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
@@ -137,6 +151,7 @@
                         attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
+                        on:editAttribute={forwardEditAttribute}
                     />
                 {/each}
             </tbody>

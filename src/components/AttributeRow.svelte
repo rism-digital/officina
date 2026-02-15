@@ -1,4 +1,8 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
+    import type { AttributeEdit } from "../app/types";
+
+    export let elementId: string | null = null;
     export let name: string;
     export let value: string;
     export let optionsAll: string[] | null = null;
@@ -6,6 +10,10 @@
     export let readOnly = false;
     export let customOptions: string[] | null = null;
     export let attributeType: string | null = null;
+
+    const dispatch = createEventDispatcher<{
+        editAttribute: AttributeEdit;
+    }>();
 
     $: filteredAll = optionsAll && optionsBasic
         ? optionsAll.filter((opt) => !optionsBasic.includes(opt))
@@ -21,6 +29,28 @@
                 ? { type: "number", step: "0.1" }
                 : null;
 
+    function emitEdit(attValue: string, commit: boolean) {
+        if (!elementId) return;
+        dispatch("editAttribute", {
+            elementId,
+            attName: name,
+            attValue,
+            commit,
+        });
+    }
+
+    function handleInput(event: Event) {
+        const target = event.target as HTMLInputElement | HTMLSelectElement | null;
+        if (!target) return;
+        emitEdit(target.value, false);
+    }
+
+    function handleChange(event: Event) {
+        const target = event.target as HTMLInputElement | HTMLSelectElement | null;
+        if (!target) return;
+        emitEdit(target.value, true);
+    }
+
     function renderOptions(values: string[], selected: string) {
         return values.map((opt) => ({
             value: opt,
@@ -33,14 +63,22 @@
     <td class="vrv-attribute-name">{name}</td>
     <td class="vrv-attribute-value">
         {#if customOptions}
-            <select class="vrv-form-input {readOnly ? 'disabled' : ''}" disabled={readOnly}>
+            <select
+                class="vrv-form-input {readOnly ? 'disabled' : ''}"
+                disabled={readOnly}
+                on:change={handleChange}
+            >
                 <option value=""></option>
                 {#each renderOptions(customOptions, value) as opt}
                     <option value={opt.value} selected={opt.selected}>{opt.value}</option>
                 {/each}
             </select>
         {:else if hasOptions}
-            <select class="vrv-form-input {readOnly ? 'disabled' : ''}" disabled={readOnly}>
+            <select
+                class="vrv-form-input {readOnly ? 'disabled' : ''}"
+                disabled={readOnly}
+                on:change={handleChange}
+            >
                 <option value=""></option>
                 {#if optionsBasic && filteredAll.length > 0}
                     <optgroup label="MEI-basic">
@@ -67,6 +105,8 @@
                 type={numericInput?.type}
                 min={numericInput?.min}
                 step={numericInput?.step}
+                on:input={handleInput}
+                on:change={handleChange}
             />
         {/if}
     </td>

@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
     import SidePanel from "./SidePanel.svelte";
-    import type { EditInfoContent, ViewModel } from "../app/types";
+    import type { AttributeEdit, EditInfoContent, ViewModel } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let view: ViewModel;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: (id: string | null) => void;
+    export let onAttributeEdit: (edit: AttributeEdit) => void;
     export let editInfoContent: EditInfoContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
@@ -17,6 +18,10 @@
 
     function forwardHover(event: CustomEvent<string | null>) {
         highlightHover(event.detail);
+    }
+
+    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
+        onAttributeEdit?.(event.detail);
     }
 
     const RESIZE_DEBOUNCE_MS = 150;
@@ -230,6 +235,7 @@
         <SidePanel
             on:selectElement={forwardSelect}
             on:hoverElement={forwardHover}
+            on:editAttribute={forwardEditAttribute}
             {editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}
