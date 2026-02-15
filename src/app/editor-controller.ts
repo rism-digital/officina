@@ -28,7 +28,7 @@ export class EditorController {
         this.stores = stores;
     }
     
-    async init(verovioUrl: string) {
+    async init(verovioUrl: string): Promise<string> {
         this.stores.workerBusy.set(true);
         await this.bridge.init(verovioUrl);
         const version = await this.bridge.verovio.getVersion();
@@ -36,25 +36,25 @@ export class EditorController {
         return version;
     }
 
-    destroy() {
+    destroy(): void {
         this.worker.terminate();
     }
 
-    hasLayoutSize() {
+    hasLayoutSize(): boolean {
         return Boolean(this.lastLayoutSize.width && this.lastLayoutSize.height);
     }
 
-    async applyLayoutForLastSize() {
+    async applyLayoutForLastSize(): Promise<void> {
         if (!this.hasLayoutSize()) return;
         await this.applyLayoutForSize(this.lastLayoutSize);
     }
 
-    async setSelection(next: SelectionInfo) {
+    async setSelection(next: SelectionInfo): Promise<void> {
         this.stores.selection.set(next);
         this.stores.viewModel.update((current) => ({ ...current, selection: next }));
     }
 
-    async updateVerovioView() {
+    async updateVerovioView(): Promise<void> {
         const { currentPage } = get(this.stores.verovioState);
         const svg = await this.bridge.verovio.renderToSVG(currentPage);
         const current = get(this.stores.viewModel);
@@ -63,7 +63,7 @@ export class EditorController {
         this.stores.workerBusy.set(false);
     }
 
-    async setCurrentPage(nextPage: number) {
+    async setCurrentPage(nextPage: number): Promise<void> {
         const { pageCount } = get(this.stores.verovioState);
         const clamped = Math.min(Math.max(1, nextPage), Math.max(1, pageCount));
         this.stores.verovioState.update((current) => ({
@@ -76,7 +76,7 @@ export class EditorController {
         }
     }
 
-    async loadData(data: string) {
+    async loadData(data: string): Promise<void> {
         this.stores.workerBusy.set(true);
         this.stores.verovioState.update((current) => ({
             ...current,
@@ -93,7 +93,7 @@ export class EditorController {
         await this.updateVerovioView();
     }
 
-    async applyLayoutForSize(size: { width: number; height: number }) {
+    async applyLayoutForSize(size: { width: number; height: number }): Promise<void> {
         if (!size.width || !size.height) return;
         this.lastLayoutSize = size;
         const current = get(this.stores.viewModel);
@@ -114,7 +114,7 @@ export class EditorController {
         await this.updateVerovioView();
     }
 
-    async applyEditLayout(commit: boolean) {
+    async applyEditLayout(commit: boolean): Promise<void> {
         if (commit) {
             await this.bridge.verovio.edit({ action: "commit", param: {} });
         } else {
@@ -123,7 +123,7 @@ export class EditorController {
         await this.updateVerovioView();
     }
 
-    async refreshContextFromSelection() {
+    async refreshContextFromSelection(): Promise<void> {
         const current = get(this.stores.selection);
         if (current.type !== "element" || !current.id) return;
         const contextOk = await this.bridge.verovio.edit({
@@ -137,7 +137,7 @@ export class EditorController {
         }
     }
 
-    async handleSelect(id: string | null) {
+    async handleSelect(id: string | null): Promise<void> {
         if (!id) {
             await this.setSelection({ type: "none" });
             this.stores.editInfoContent.set(null);
@@ -168,7 +168,7 @@ export class EditorController {
         });
     }
 
-    async handleAttributeEdit(param: EditActionParamSet, commit: boolean) {
+    async handleAttributeEdit(param: EditActionParamSet, commit: boolean): Promise<void> {
         this.stores.workerBusy.set(true);
         try {
             const editorAction: EditorAction = {
@@ -191,35 +191,35 @@ export class EditorController {
         }
     }
 
-    async saveDoc() {
+    async saveDoc(): Promise<string> {
         const exported = await this.bridge.verovio.getMEI();
         this.stores.dirty.set(false);
         this.stores.statusLine.set("Saved to local storage.");
         return exported;
     }
 
-    async exportSvg() {
+    async exportSvg(): Promise<string> {
         const exported = await this.bridge.verovio.renderToSVG(1);
         this.stores.statusLine.set("Exported SVG file.");
         return exported;
     }
 
-    canZoomIn(zoom: number) {
+    canZoomIn(zoom: number): boolean {
         return this.getZoomIndex(zoom) < zoomLevels.length - 1;
     }
 
-    canZoomOut(zoom: number) {
+    canZoomOut(zoom: number): boolean {
         return this.getZoomIndex(zoom) > 0;
     }
 
-    getZoomIndex(value: number) {
+    getZoomIndex(value: number): number {
         const sorted = [...zoomLevels].sort((a, b) => a - b);
         const index = sorted.findIndex((level) => level >= value);
         if (index === -1) return sorted.length - 1;
         return sorted[index] === value ? index : Math.max(index - 1, 0);
     }
 
-    getNextZoom(current: number, direction: 1 | -1) {
+    getNextZoom(current: number, direction: 1 | -1): number {
         const sorted = [...zoomLevels].sort((a, b) => a - b);
         const index = sorted.findIndex((level) => level >= current);
         if (direction > 0) {
@@ -232,7 +232,7 @@ export class EditorController {
         return sorted[Math.max(prev, 0)];
     }
 
-    async adjustZoom(direction: 1 | -1) {
+    async adjustZoom(direction: 1 | -1): Promise<void> {
         this.stores.verovioState.update((current) => ({
             ...current,
             zoom: Math.min(200, Math.max(10, Math.floor(this.getNextZoom(current.zoom, direction)))),
@@ -242,7 +242,7 @@ export class EditorController {
         }
     }
 
-    private clampZoom(value: number) {
+    private clampZoom(value: number): number {
         return Math.min(200, Math.max(10, Math.floor(value)));
     }
 
