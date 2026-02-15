@@ -10,7 +10,7 @@ type ControllerStores = {
     viewModel: Writable<ViewModel>;
     selection: Writable<SelectionInfo>;
     statusLine: Writable<string>;
-    workerStatus: Writable<"idle" | "busy">;
+    workerBusy: Writable<boolean>;
     dirty: Writable<boolean>;
     editInfoContent: Writable<EditInfoContent | null>;
 };
@@ -29,10 +29,10 @@ export class EditorController {
     }
     
     async init(verovioUrl: string) {
-        this.stores.workerStatus.set("busy");
+        this.stores.workerBusy.set(true);
         await this.bridge.init(verovioUrl);
         const version = await this.bridge.verovio.getVersion();
-        this.stores.workerStatus.set("idle");
+        this.stores.workerBusy.set(false);
         return version;
     }
 
@@ -60,7 +60,7 @@ export class EditorController {
         const current = get(this.stores.viewModel);
         this.svgRenderId += 1;
         this.stores.viewModel.set({ ...current, svg, svgId: this.svgRenderId });
-        this.stores.workerStatus.set("idle");
+        this.stores.workerBusy.set(false);
     }
 
     async setCurrentPage(nextPage: number) {
@@ -71,13 +71,13 @@ export class EditorController {
             currentPage: clamped,
         }));
         if (get(this.stores.viewModel).svg) {
-            this.stores.workerStatus.set("busy");
+            this.stores.workerBusy.set(true);
             await this.updateVerovioView();
         }
     }
 
     async loadData(data: string) {
-        this.stores.workerStatus.set("busy");
+        this.stores.workerBusy.set(true);
         this.stores.verovioState.update((current) => ({
             ...current,
             currentPage: 1,
@@ -98,7 +98,7 @@ export class EditorController {
         this.lastLayoutSize = size;
         const current = get(this.stores.viewModel);
         if (!current.svg) return;
-        this.stores.workerStatus.set("busy");
+        this.stores.workerBusy.set(true);
         const options = this.buildVerovioOptions(size);
         await this.bridge.verovio.setOptions(options);
         await this.bridge.verovio.redoLayout();
@@ -169,7 +169,7 @@ export class EditorController {
     }
 
     async handleAttributeEdit(param: EditActionParamSet, commit: boolean) {
-        this.stores.workerStatus.set("busy");
+        this.stores.workerBusy.set(true);
         try {
             const editorAction: EditorAction = {
                 action: "set",
@@ -183,11 +183,11 @@ export class EditorController {
                     await this.refreshContextFromSelection();
                 }
             } else {
-                this.stores.workerStatus.set("idle");
+                this.stores.workerBusy.set(false);
             }
         } catch (error) {
             console.error("Failed to update attribute", error);
-            this.stores.workerStatus.set("idle");
+            this.stores.workerBusy.set(false);
         }
     }
 

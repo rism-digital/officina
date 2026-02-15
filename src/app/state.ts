@@ -14,6 +14,6 @@ export const verovioState = writable({
     pageCount: 0,
     currentPage: 1
 });
-export const workerStatus = writable<'idle' | 'busy'>('idle');
+export const workerBusy = writable(false);
 export const dirty = writable(false);
 export const statusLine = writable('Ready');

@@ -15,7 +15,7 @@
         statusLine,
         verovioState,
         viewModel,
-        workerStatus,
+        workerBusy,
     } from "./app/state";
 
     const VEROVIO_URL =
@@ -45,7 +45,7 @@
             viewModel,
             selection,
             statusLine,
-            workerStatus,
+            workerBusy,
             dirty,
             editInfoContent,
         },
@@ -127,11 +127,11 @@
         onZoomOut={() => controller.adjustZoom(-1)}
         onPrevPage={() => controller.setCurrentPage(get(verovioState).currentPage - 1)}
         onNextPage={() => controller.setCurrentPage(get(verovioState).currentPage + 1)}
-        canZoom={$verovioState.pageCount > 0}
-        canZoomIn={controller.canZoomIn($verovioState.zoom)}
-        canZoomOut={controller.canZoomOut($verovioState.zoom)}
-        canGoPrev={$verovioState.currentPage > 1}
-        canGoNext={$verovioState.currentPage < $verovioState.pageCount}
+        canZoom={!$workerBusy && $verovioState.pageCount > 0}
+        canZoomIn={!$workerBusy && controller.canZoomIn($verovioState.zoom)}
+        canZoomOut={!$workerBusy && controller.canZoomOut($verovioState.zoom)}
+        canGoPrev={!$workerBusy && $verovioState.currentPage > 1}
+        canGoNext={!$workerBusy && $verovioState.currentPage < $verovioState.pageCount}
     ></Menu>
 
     <Toolbar mode={$mode} onToggleMode={toggleMode} />
