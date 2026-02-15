@@ -83,11 +83,40 @@
     function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
         dispatch("editAttribute", event.detail);
     }
+
+    function emitTextEdit(attValue: string, commit: boolean) {
+        const elementId = editInfoContent?.object?.id ?? null;
+        if (!elementId) return;
+        dispatch("editAttribute", {
+            elementId,
+            attName: "text",
+            attValue,
+            commit
+        });
+    }
+
+    function handleTextInput(event: Event) {
+        const target = event.target as HTMLInputElement | null;
+        if (!target) return;
+        emitTextEdit(target.value, false);
+    }
+
+    function handleTextBlur(event: Event) {
+        const target = event.target as HTMLInputElement | null;
+        if (!target) return;
+        emitTextEdit(target.value, true);
+    }
 </script>
 
 <div class="vrv-attribute-list-wrapper">
     {#if editInfoContent?.object && editInfoContent.object.text}
-        <input class="vrv-form-input" data-att-name="text" value={editInfoContent.object.text}>
+        <input
+            class="vrv-form-input"
+            data-att-name="text"
+            value={editInfoContent.object.text}
+            on:input={handleTextInput}
+            on:blur={handleTextBlur}
+        >
     {:else}
     <div class="vrv-attribute-filter"></div>
     <table class="vrv-attribute-table">
