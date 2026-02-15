@@ -26,7 +26,6 @@
     
     let fileInput: HTMLInputElement | null = null;
     let verovioVersion = "";
-    const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
     let rngMEIAll: RNGLoader | null = null;
     let rngMEIBasic: RNGLoader | null = null;
 
@@ -79,36 +78,6 @@
         controller.destroy();
     });
 
-    function getNextZoom(current: number, direction: 1 | -1) {
-        const sorted = [...zoomLevels].sort((a, b) => a - b);
-        const index = sorted.findIndex((level) => level >= current);
-        if (direction > 0) {
-            if (index === -1) return sorted[sorted.length - 1];
-            const next = sorted[index] === current ? index + 1 : index;
-            return sorted[Math.min(next, sorted.length - 1)];
-        }
-        if (index === -1) return sorted[0];
-        const prev = sorted[index] === current ? index - 1 : index - 1;
-        return sorted[Math.max(prev, 0)];
-    }
-
-    function getZoomIndex(value: number) {
-        const sorted = [...zoomLevels].sort((a, b) => a - b);
-        const index = sorted.findIndex((level) => level >= value);
-        if (index === -1) return sorted.length - 1;
-        return sorted[index] === value ? index : Math.max(index - 1, 0);
-    }
-
-    async function adjustZoom(direction: 1 | -1) {
-        verovioState.update((current) => ({
-            ...current,
-            zoom: Math.min(200, Math.max(10, Math.floor(getNextZoom(current.zoom, direction)))),
-        }));
-        if (controller.hasLayoutSize()) {
-            await controller.applyLayoutForLastSize();
-        }
-    }
-
     function toggleMode() {
         mode.update((current) => (current === "insert" ? "edit" : "insert"));
     }
@@ -154,13 +123,13 @@
         on:open={triggerOpenFile}
         on:save={saveDoc}
         on:export={exportDoc}
-        on:zoomIn={() => adjustZoom(1)}
-        on:zoomOut={() => adjustZoom(-1)}
+        on:zoomIn={() => controller.adjustZoom(1)}
+        on:zoomOut={() => controller.adjustZoom(-1)}
         on:prevPage={() => controller.setCurrentPage(get(verovioState).currentPage - 1)}
         on:nextPage={() => controller.setCurrentPage(get(verovioState).currentPage + 1)}
         canZoom={$verovioState.pageCount > 0}
-        canZoomIn={getZoomIndex($verovioState.zoom) < zoomLevels.length - 1}
-        canZoomOut={getZoomIndex($verovioState.zoom) > 0}
+        canZoomIn={controller.canZoomIn($verovioState.zoom)}
+        canZoomOut={controller.canZoomOut($verovioState.zoom)}
         canGoPrev={$verovioState.currentPage > 1}
         canGoNext={$verovioState.currentPage < $verovioState.pageCount}
     ></Menu>

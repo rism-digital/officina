@@ -3,6 +3,8 @@ import type { AttributeEdit, EditActionParamSet, EditInfoContent, EditorAction, 
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 
+const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
+
 type ControllerStores = {
     verovioState: Writable<{ zoom: number; pageCount: number; currentPage: number }>;
     viewModel: Writable<ViewModel>;
@@ -205,6 +207,44 @@ export class EditorController {
         const exported = await this.bridge.verovio.renderToSVG(1);
         this.stores.statusLine.set("Exported SVG file.");
         return exported;
+    }
+
+    canZoomIn(zoom: number) {
+        return this.getZoomIndex(zoom) < zoomLevels.length - 1;
+    }
+
+    canZoomOut(zoom: number) {
+        return this.getZoomIndex(zoom) > 0;
+    }
+
+    getZoomIndex(value: number) {
+        const sorted = [...zoomLevels].sort((a, b) => a - b);
+        const index = sorted.findIndex((level) => level >= value);
+        if (index === -1) return sorted.length - 1;
+        return sorted[index] === value ? index : Math.max(index - 1, 0);
+    }
+
+    getNextZoom(current: number, direction: 1 | -1) {
+        const sorted = [...zoomLevels].sort((a, b) => a - b);
+        const index = sorted.findIndex((level) => level >= current);
+        if (direction > 0) {
+            if (index === -1) return sorted[sorted.length - 1];
+            const next = sorted[index] === current ? index + 1 : index;
+            return sorted[Math.min(next, sorted.length - 1)];
+        }
+        if (index === -1) return sorted[0];
+        const prev = sorted[index] === current ? index - 1 : index - 1;
+        return sorted[Math.max(prev, 0)];
+    }
+
+    async adjustZoom(direction: 1 | -1) {
+        this.stores.verovioState.update((current) => ({
+            ...current,
+            zoom: Math.min(200, Math.max(10, Math.floor(this.getNextZoom(current.zoom, direction)))),
+        }));
+        if (this.hasLayoutSize()) {
+            await this.applyLayoutForLastSize();
+        }
     }
 
     private clampZoom(value: number) {
