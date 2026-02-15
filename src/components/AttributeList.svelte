@@ -1,16 +1,12 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import AttributeRow from "./AttributeRow.svelte";
-    import type { AttributeEdit, EditInfoContent } from "../app/types";
+    import type { EditActionParamSet, EditAttributeHandler, EditInfoContent } from "../app/types";
     import type { ElementDef, RNGLoader } from "../app/rng-loader";
 
     export let editInfoContent: EditInfoContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
-
-    const dispatch = createEventDispatcher<{
-        editAttribute: AttributeEdit;
-    }>();
+    export let onEditAttribute: EditAttributeHandler | null = null;
 
     $: elementName = editInfoContent?.object?.element ?? "";
     $: attributes = {
@@ -80,19 +76,15 @@
         if (showAll) showBasic = true;
     }
 
-    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
-        dispatch("editAttribute", event.detail);
-    }
-
     function emitTextEdit(attValue: string, commit: boolean) {
         const elementId = editInfoContent?.object?.id ?? null;
         if (!elementId) return;
-        dispatch("editAttribute", {
+        const param: EditActionParamSet = {
             elementId,
-            attName: "text",
-            attValue,
-            commit
-        });
+            attribute: "text",
+            value: attValue,
+        };
+        onEditAttribute?.(param, commit);
     }
 
     function handleTextInput(event: Event) {
@@ -131,7 +123,7 @@
                     attributeType={typeFor(name)}
                     readOnly={isReadOnly(name)}
                     customOptions={customOptionsFor(name)}
-                    on:editAttribute={forwardEditAttribute}
+                    onEditAttribute={onEditAttribute}
                 />
             {/each}
             <tr>
@@ -155,7 +147,7 @@
                         attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
-                        on:editAttribute={forwardEditAttribute}
+                        onEditAttribute={onEditAttribute}
                     />
                 {/each}
                 <tr>
@@ -180,7 +172,7 @@
                         attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
-                        on:editAttribute={forwardEditAttribute}
+                        onEditAttribute={onEditAttribute}
                     />
                 {/each}
             </tbody>

@@ -1,28 +1,17 @@
 <script lang="ts">
-    import { createEventDispatcher, tick } from "svelte";
+    import { tick } from "svelte";
     import TreeCrumb from "./TreeCrumb.svelte";
     import TreeNode from "./TreeNode.svelte";
-    import type { TreeNodeData } from "../app/types";
+    import type { HoverElementHandler, SelectElementHandler, TreeNodeData } from "../app/types";
 
     export let ancestors: TreeNodeData[] | null = null;
     export let context: TreeNodeData | null = null;
     export let selectedId: string | null = null;
+    export let onSelectElement: SelectElementHandler | null = null;
+    export let onHoverElement: HoverElementHandler | null = null;
 
     let breadcrumbsWrapper: HTMLDivElement | null = null;
     let treeRoot: HTMLDivElement | null = null;
-
-    const dispatch = createEventDispatcher<{
-        selectElement: string;
-        hoverElement: string | null;
-    }>();
-
-    function handleSelect(event: CustomEvent<string>) {
-        dispatch("selectElement", event.detail);
-    }
-
-    function handleHover(event: CustomEvent<string | null>) {
-        dispatch("hoverElement", event.detail);
-    }
 
     async function scrollBreadcrumbsToEnd() {
         await tick();
@@ -61,8 +50,8 @@
                 <TreeCrumb
                     id={ancestor.id}
                     label={ancestor.element}
-                    on:select={handleSelect}
-                    on:hover={handleHover}
+                    onSelect={onSelectElement}
+                    onHover={onHoverElement}
                 />
             {/each}
         {/if}
@@ -74,8 +63,8 @@
             node={context}
             isRoot
             {selectedId}
-            on:select={handleSelect}
-            on:hover={handleHover}
+            onSelect={onSelectElement}
+            onHover={onHoverElement}
         />
     {/if}
 </div>

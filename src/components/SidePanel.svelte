@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import ContentTab from "./ContentTab.svelte";
     import ScoreTab from "./ScoreTab.svelte";
-    import type { AttributeEdit, EditInfoContent, Tab } from "../app/types";
+    import type { EditAttributeHandler, EditInfoContent, HoverElementHandler, SelectElementHandler, Tab } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export const items: Tab[] = [
@@ -14,24 +13,9 @@
     export let editInfoContent: EditInfoContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
-
-    const dispatch = createEventDispatcher<{
-        selectElement: string;
-        hoverElement: string | null;
-        editAttribute: AttributeEdit;
-    }>();
-
-    function forwardSelect(event: CustomEvent<string>) {
-        dispatch("selectElement", event.detail);
-    }
-    
-    function forwardHover(event: CustomEvent<string | null>) {
-        dispatch("hoverElement", event.detail);
-    }
-
-    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
-        dispatch("editAttribute", event.detail);
-    }
+    export let onSelectElement: SelectElementHandler | null = null;
+    export let onHoverElement: HoverElementHandler | null = null;
+    export let onEditAttribute: EditAttributeHandler | null = null;
 
     const handleClick = (tabValue: number) => () => {
         activeTabValue = tabValue;
@@ -58,9 +42,9 @@
                     <div class="vrv-tab-content-panel" style="display: flex;">
                         <svelte:component
                             this={item.component}
-                            on:selectElement={forwardSelect}
-                            on:hoverElement={forwardHover}
-                            on:editAttribute={forwardEditAttribute}
+                            {onSelectElement}
+                            {onHoverElement}
+                            {onEditAttribute}
                             editInfoContent={editInfoContent}
                             {rngMEIAll}
                             {rngMEIBasic}

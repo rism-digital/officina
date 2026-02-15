@@ -1,27 +1,27 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
     import SidePanel from "./SidePanel.svelte";
-    import type { AttributeEdit, EditInfoContent, ViewModel } from "../app/types";
+    import type { EditActionParamSet, EditAttributeHandler, EditInfoContent, SelectElementHandler, ViewModel } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let view: ViewModel;
     export let onResize: (size: { width: number; height: number }) => void;
-    export let onElementSelect: (id: string | null) => void;
-    export let onAttributeEdit: (edit: AttributeEdit) => void;
+    export let onElementSelect: SelectElementHandler | null = null;
+    export let onAttributeEdit: EditAttributeHandler | null = null;
     export let editInfoContent: EditInfoContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
 
-    function forwardSelect(event: CustomEvent<string>) {
-        onElementSelect?.(event.detail);
+    function handleSelect(id: string | null) {
+        if (id) onElementSelect?.(id);
     }
 
-    function forwardHover(event: CustomEvent<string | null>) {
-        highlightHover(event.detail);
+    function handleHover(id: string | null) {
+        highlightHover(id);
     }
 
-    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
-        onAttributeEdit?.(event.detail);
+    function handleEditAttribute(param: EditActionParamSet, commit: boolean) {
+        onAttributeEdit?.(param, commit);
     }
 
     const RESIZE_DEBOUNCE_MS = 150;
@@ -233,9 +233,9 @@
     {/if}
     <div class="vrv-h-split">
         <SidePanel
-            on:selectElement={forwardSelect}
-            on:hoverElement={forwardHover}
-            on:editAttribute={forwardEditAttribute}
+            onSelectElement={handleSelect}
+            onHoverElement={handleHover}
+            onEditAttribute={handleEditAttribute}
             {editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}

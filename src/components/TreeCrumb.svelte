@@ -1,18 +1,18 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import type { HoverElementHandler, SelectElementHandler } from "../app/types";
 
     export let id: string | null = null;
     export let label = "";
-
-    const dispatch = createEventDispatcher<{ select: string; hover: string | null }>();
+    export let onSelect: SelectElementHandler | null = null;
+    export let onHover: HoverElementHandler | null = null;
 
     function handleSelect() {
         if (!id) return;
-        dispatch("select", id);
+        onSelect?.(id);
     }
 
     function handleHover(active: boolean) {
-        dispatch("hover", active ? id : null);
+        onHover?.(active ? id : null);
     }
 </script>
 

@@ -1,18 +1,14 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import type { TreeNodeData } from "../app/types";
+    import type { HoverElementHandler, SelectElementHandler, TreeNodeData } from "../app/types";
     import { iconFor } from "../app/icons";
 
     export let node: TreeNodeData;
     export let isRoot = false;
     export let selectedId: string | null = null;
+    export let onSelect: SelectElementHandler | null = null;
+    export let onHover: HoverElementHandler | null = null;
 
     let htmlTreeNode: HTMLDivElement | null = null;
-
-    const dispatch = createEventDispatcher<{
-        select: string;
-        hover: string | null;
-    }>();
 
     function handleOpenClose() {
         if (!htmlTreeNode) return;
@@ -25,15 +21,15 @@
     }
 
     function handleSelect() {
-        dispatch("select", node.id);
+        onSelect?.(node.id);
     }
 
     function handleMouseEnter() {
-        dispatch("hover", node.id);
+        onHover?.(node.id);
     }
 
     function handleMouseLeave() {
-        dispatch("hover", null);
+        onHover?.(null);
     }
 </script>
 
@@ -60,7 +56,7 @@
     <div class="vrv-node-children">
         {#if node.children?.length}
             {#each node.children as child}
-                <svelte:self node={child} {selectedId} on:select on:hover />
+                <svelte:self node={child} {selectedId} {onSelect} {onHover} />
             {/each}
         {/if}
     </div>

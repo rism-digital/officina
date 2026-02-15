@@ -120,13 +120,13 @@
 
 <div class="vrv-wrapper">
     <Menu
-        on:open={triggerOpenFile}
-        on:save={saveDoc}
-        on:export={exportDoc}
-        on:zoomIn={() => controller.adjustZoom(1)}
-        on:zoomOut={() => controller.adjustZoom(-1)}
-        on:prevPage={() => controller.setCurrentPage(get(verovioState).currentPage - 1)}
-        on:nextPage={() => controller.setCurrentPage(get(verovioState).currentPage + 1)}
+        onOpen={triggerOpenFile}
+        onSave={saveDoc}
+        onExport={exportDoc}
+        onZoomIn={() => controller.adjustZoom(1)}
+        onZoomOut={() => controller.adjustZoom(-1)}
+        onPrevPage={() => controller.setCurrentPage(get(verovioState).currentPage - 1)}
+        onNextPage={() => controller.setCurrentPage(get(verovioState).currentPage + 1)}
         canZoom={$verovioState.pageCount > 0}
         canZoomIn={controller.canZoomIn($verovioState.zoom)}
         canZoomOut={controller.canZoomOut($verovioState.zoom)}
@@ -140,7 +140,7 @@
         view={$viewModel}
         onResize={(size) => controller.applyLayoutForSize(size)}
         onElementSelect={(id) => controller.handleSelect(id)}
-        onAttributeEdit={(edit) => controller.handleAttributeEdit(edit)}
+        onAttributeEdit={(param, commit) => controller.handleAttributeEdit(param, commit)}
         editInfoContent={$editInfoContent}
         {rngMEIAll}
         {rngMEIBasic}

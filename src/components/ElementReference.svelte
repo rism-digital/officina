@@ -1,26 +1,22 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import type { ReferenceObject } from "../app/types";
+    import type { HoverElementHandler, ReferenceObject, SelectElementHandler } from "../app/types";
     import { iconFor } from "../app/icons";
 
     export let references: ReferenceObject[] | null = null;
     export let direction: "from" | "to" = "from";
-
-    const dispatch = createEventDispatcher<{
-        selectElement: string;
-        hoverElement: string | null;
-    }>();
+    export let onSelectElement: SelectElementHandler | null = null;
+    export let onHoverElement: HoverElementHandler | null = null;
 
     function handleClick(id: string) {
-        dispatch("selectElement", id);
+        onSelectElement?.(id);
     }
 
     function handleMouseEnter(id: string) {
-        dispatch("hoverElement", id);
+        onHoverElement?.(id);
     }
 
     function handleMouseLeave() {
-        dispatch("hoverElement", null);
+        onHoverElement?.(null);
     }
 </script>
 

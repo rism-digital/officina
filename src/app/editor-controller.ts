@@ -1,5 +1,5 @@
 import { get, type Writable } from "svelte/store";
-import type { AttributeEdit, EditActionParamSet, EditInfoContent, EditorAction, SelectionInfo, ViewModel } from "./types";
+import type { EditActionParamSet, EditInfoContent, EditorAction, SelectionInfo, ViewModel } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 
@@ -168,23 +168,18 @@ export class EditorController {
         });
     }
 
-    async handleAttributeEdit(edit: AttributeEdit) {
+    async handleAttributeEdit(param: EditActionParamSet, commit: boolean) {
         this.stores.workerStatus.set("busy");
         try {
-            const editActionParam: EditActionParamSet = {
-                elementId: edit.elementId,
-                attribute: edit.attName,
-                value: edit.attValue,
-            };
             const editorAction: EditorAction = {
                 action: "set",
-                param: editActionParam,
+                param,
             };
             const ok = await this.bridge.verovio.edit(editorAction);
             if (ok) {
                 this.stores.editInfoContent.set(await this.bridge.verovio.editInfo() as EditInfoContent);
-                await this.applyEditLayout(edit.commit);
-                if (edit.commit) {
+                await this.applyEditLayout(commit);
+                if (commit) {
                     await this.refreshContextFromSelection();
                 }
             } else {

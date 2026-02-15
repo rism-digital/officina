@@ -1,5 +1,10 @@
 export type Mode = 'edit' | 'insert';
 
+export type SelectElementHandler = (id: string) => void;
+export type HoverElementHandler = (id: string | null) => void;
+export type EditAttributeHandler = (param: EditActionParamSet, commit: boolean) => void;
+export type ActionHandler = () => void;
+
 export interface SelectionInfo {
     type: 'none' | 'element';
     label?: string;
@@ -24,7 +29,7 @@ export interface TreeNodeData {
 export interface Tab {
     label: string;
     value: number;
-    component: any; // Replace with specific Svelte component type if available
+    component: any;
 }
 
 export interface EditInfo {
@@ -46,18 +51,11 @@ export interface EditInfoContent {
     referringElements: ReferenceObject[];
 }
 
-export type AttributeEdit = {
-    elementId: string;
-    attName: string;
-    attValue: string;
-    commit: boolean;
-};
-
 export type EditActionParamSet = {
     elementId: string;
     attribute: string;
     value: string;
-}
+};
 
 export type EditorAction = {
     action: "commit" | "context" | "set";

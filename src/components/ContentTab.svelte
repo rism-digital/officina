@@ -1,15 +1,17 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import AttributeList from "./AttributeList.svelte";
     import ElementReference from "./ElementReference.svelte";
     import Tree from "./Tree.svelte";
     import { selection } from "../app/state";
-    import type { AttributeEdit, EditInfoContent } from "../app/types";
+    import type { EditAttributeHandler, EditInfoContent, HoverElementHandler, SelectElementHandler } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let editInfoContent: EditInfoContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
+    export let onSelectElement: SelectElementHandler | null = null;
+    export let onHoverElement: HoverElementHandler | null = null;
+    export let onEditAttribute: EditAttributeHandler | null = null;
 
     let closedSections = {
         structure: false,
@@ -17,24 +19,6 @@
         referencing: false,
         referenced: false,
     };
-
-    const dispatch = createEventDispatcher<{
-        selectElement: string;
-        hoverElement: string | null;
-        editAttribute: AttributeEdit;
-    }>();
-
-    function forwardSelect(event: CustomEvent<string>) {
-        dispatch("selectElement", event.detail);
-    }
-
-    function forwardHover(event: CustomEvent<string | null>) {
-        dispatch("hoverElement", event.detail);
-    }
-
-    function forwardEditAttribute(event: CustomEvent<AttributeEdit>) {
-        dispatch("editAttribute", event.detail);
-    }
 
     function toggleSection(key: keyof typeof closedSections) {
         closedSections = { ...closedSections, [key]: !closedSections[key] };
@@ -57,8 +41,8 @@
             ancestors={editInfoContent?.ancestors ?? null}
             context={editInfoContent?.context ?? null}
             selectedId={$selection.id ?? null}
-            on:selectElement={forwardSelect}
-            on:hoverElement={forwardHover}
+            {onSelectElement}
+            {onHoverElement}
         />
     </div>
 </div>
@@ -79,7 +63,7 @@
             {editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}
-            on:editAttribute={forwardEditAttribute}
+            {onEditAttribute}
         />
     </div>
 </div>
@@ -96,8 +80,8 @@
         <ElementReference
             references={editInfoContent?.referringElements ?? null}
             direction="to"
-            on:selectElement={forwardSelect}
-            on:hoverElement={forwardHover}
+            {onSelectElement}
+            {onHoverElement}
         />
     </div>
 </div>
@@ -114,8 +98,8 @@
         <ElementReference
             references={editInfoContent?.referencedElements ?? null}
             direction="from"
-            on:selectElement={forwardSelect}
-            on:hoverElement={forwardHover}
+            {onSelectElement}
+            {onHoverElement}
         />
     </div>
 </div>
