@@ -171,6 +171,7 @@
     async function confirmXmlReload() {
         xmlReloadDialogOpen = false;
         try {
+            selection.set({ type: "none" });
             localStorage.setItem(STORAGE_KEY, xmlContent);
             await controller.loadData(xmlContent);
             xmlInitialContent = xmlContent;
@@ -205,7 +206,6 @@
         );
         xmlContent = await controller.getMEI(meiExportOptions);
         xmlInitialContent = xmlContent;
-        selection.set({ type: "none" });
         xmlMode = true;
         exportDialogOpen = false;
         statusLine.set("XML editor enabled.");
@@ -288,6 +288,7 @@
         <XmlPanel
             value={xmlContent}
             workerBusy={$workerBusy}
+            selectedId={$selection.type === "element" ? $selection.id : null}
             onChange={(value) => (xmlContent = value)}
         />
     {:else}
