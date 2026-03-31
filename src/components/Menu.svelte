@@ -23,10 +23,22 @@
         <div class="vrv-btn-text" data-before="File"></div>
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
-            <div class="vrv-menu-text" data-before="Import MEI file" on:click={() => onOpen?.()}></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Import MEI file"
+                on:click={() => onOpen?.()}
+            ></div>
             <div class="vrv-v-separator"></div>
-            <div class="vrv-menu-text" data-before="Export MEI file" on:click={() => onSave?.()}></div>
-            <div class="vrv-menu-text" data-before="Export as SVG" on:click={() => onExport?.()}></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Export MEI file"
+                on:click={() => onSave?.()}
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Export as SVG"
+                on:click={() => onExport?.()}
+            ></div>
         </div>
     </div>
     <div class="vrv-menu">
@@ -34,13 +46,6 @@
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
             <div class="vrv-menu-text" data-before="Score properties"></div>
-        </div>
-    </div>
-    <div class="vrv-menu">
-        <div class="vrv-btn-text" data-before="Help"></div>
-        <div class="vrv-menu-content">
-            <div class="vrv-v-separator"></div>
-            <div class="vrv-menu-text" data-before="About" on:click={() => onAbout?.()}></div>
         </div>
     </div>
     <div class="vrv-btn-group">
@@ -85,5 +90,17 @@
             data-before="Zoom in"
             on:click={() => onZoomIn?.()}
         ></div>
+    </div>
+    <div class="vrv-h-separator"></div>
+    <div class="vrv-menu">
+        <div class="vrv-btn-text" data-before="Help"></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text"
+                data-before="About"
+                on:click={() => onAbout?.()}
+            ></div>
+        </div>
     </div>
 </nav>

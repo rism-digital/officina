@@ -3,7 +3,7 @@
     import Dialog from "./Dialog.svelte";
 
     export let open = false;
-    export let title = "Export MEI";
+    export let title = "Select the MEI export options";
     export let value: MEIExportOptions = {
         basic: false,
         removeIds: false,

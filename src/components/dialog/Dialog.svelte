@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onDestroy, tick } from "svelte";
 
-    type DialogType = "msg" | "okcancel";
+    type DialogType = "msg" | "okcancel" | "custom";
 
     export let open = false;
     export let title = "";
@@ -22,6 +22,9 @@
             handleCancel();
             return;
         }
+        if (type === "custom") {
+            return;
+        }
         if (event.key === "Enter") {
             handleOk();
         }
@@ -33,7 +36,7 @@
     }
 
     function handleOk() {
-        const value = type === "msg" ? 0 : 1;
+        const value = type === "okcancel" ? 1 : 0;
         onOk?.(value);
         onClose?.(value);
     }
@@ -80,7 +83,7 @@
 
         <div class="vrv-dialog-bottom">
             <slot name="buttons"></slot>
-            {#if type !== "msg"}
+            {#if type === "okcancel"}
                 <div
                     class="vrv-dialog-btn"
                     role="button"
@@ -90,15 +93,17 @@
                     on:keydown={(event) => handleActionKeydown(event, "cancel")}
                 ></div>
             {/if}
-            <div
-                class="vrv-dialog-btn"
-                role="button"
-                tabindex="0"
-                data-before={okLabel}
-                bind:this={okButton}
-                on:click={handleOk}
-                on:keydown={(event) => handleActionKeydown(event, "ok")}
-            ></div>
+            {#if type !== "custom"}
+                <div
+                    class="vrv-dialog-btn"
+                    role="button"
+                    tabindex="0"
+                    data-before={okLabel}
+                    bind:this={okButton}
+                    on:click={handleOk}
+                    on:keydown={(event) => handleActionKeydown(event, "ok")}
+                ></div>
+            {/if}
         </div>
     </div>
 </div>

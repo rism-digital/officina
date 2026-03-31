@@ -5,6 +5,7 @@
     import XmlPanel from "./components/XmlPanel.svelte";
     import DialogAbout from "./components/dialog/DialogAbout.svelte";
     import DialogExport from "./components/dialog/DialogExport.svelte";
+    import DialogXmlReload from "./components/dialog/DialogXmlReload.svelte";
     import Menu from "./components/Menu.svelte";
     import Toolbar from "./components/Toolbar.svelte";
     import StatusBar from "./components/StatusBar.svelte";
@@ -33,7 +34,7 @@
     const DEFAULT_MEI_EXPORT_OPTIONS: MEIExportOptions = {
         basic: false,
         removeIds: false,
-        ignoreHeader: false
+        ignoreHeader: false,
     };
 
     let fileInput: HTMLInputElement | null = null;
@@ -44,7 +45,9 @@
     let xmlContent = "";
     let aboutOpen = false;
     let exportDialogOpen = false;
+    let xmlReloadDialogOpen = false;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
+    let xmlInitialContent = "";
     let ABOUT_LIBRARIES_HTML = "";
 
     $: ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
@@ -53,7 +56,7 @@
     const ABOUT_LICENSE_URL =
         "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE";
     const ABOUT_CHANGELOG_URL =
-        "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md"
+        "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md";
 
     async function loadRngSchema(loader: RNGLoader, schemaUrl: string) {
         const response = await fetch(schemaUrl);
@@ -149,15 +152,44 @@
     }
 
     async function toggleXmlMode() {
-        const next = !xmlMode;
-        if (next) {
+        const switchToXmlMode = !xmlMode;
+        if (switchToXmlMode) {
             exportDialogOpen = true;
         } else {
+            if (xmlContent === xmlInitialContent) {
+                xmlMode = false;
+                statusLine.set("Score view enabled.");
+                return;
+            }
+
+            // Placeholder for XML validation before confirming reload.
+            xmlReloadDialogOpen = true;
+        }
+    }
+
+    async function confirmXmlReload() {
+        xmlReloadDialogOpen = false;
+        try {
             localStorage.setItem(STORAGE_KEY, xmlContent);
             await controller.loadData(xmlContent);
+            xmlInitialContent = xmlContent;
             xmlMode = false;
             statusLine.set("Score view enabled.");
+        } catch (error) {
+            console.error("Failed to reload score from XML", error);
+            statusLine.set("Failed to reload score from XML.");
         }
+    }
+
+    function skipXmlReload() {
+        xmlReloadDialogOpen = false;
+        xmlMode = false;
+        statusLine.set("Score view enabled without XML reload.");
+    }
+
+    function cancelXmlReload() {
+        xmlReloadDialogOpen = false;
+        statusLine.set("Stayed in XML editor.");
     }
 
     function closeExportDialog() {
@@ -171,6 +203,7 @@
             JSON.stringify(meiExportOptions),
         );
         xmlContent = await controller.getMEI(meiExportOptions);
+        xmlInitialContent = xmlContent;
         selection.set({ type: "none" });
         xmlMode = true;
         exportDialogOpen = false;
@@ -186,6 +219,7 @@
             selection.set({ type: "none" });
             localStorage.setItem(STORAGE_KEY, xmlContent);
             await controller.loadData(xmlContent);
+            xmlInitialContent = xmlContent;
             dirty.set(false);
             statusLine.set("Applied XML content.");
         } catch (error) {
@@ -196,6 +230,7 @@
 
     async function reloadXmlContent() {
         xmlContent = await controller.getMEI();
+        xmlInitialContent = xmlContent;
         statusLine.set("Reloaded XML content.");
     }
 
@@ -224,7 +259,6 @@
         onNextPage={() =>
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
-        onAbout={openAboutDialog}
         canZoom={!xmlMode && !$workerBusy && $verovioState.pageCount > 0}
         canZoomIn={!xmlMode &&
             !$workerBusy &&
@@ -236,6 +270,7 @@
         canGoNext={!xmlMode &&
             !$workerBusy &&
             $verovioState.currentPage < $verovioState.pageCount}
+        onAbout={openAboutDialog}
         {xmlMode}
     ></Menu>
 
@@ -284,5 +319,12 @@
         onConfirm={confirmExportOptions}
         onCancel={closeExportDialog}
         onClose={closeExportDialog}
+    />
+
+    <DialogXmlReload
+        open={xmlReloadDialogOpen}
+        onYes={confirmXmlReload}
+        onNo={skipXmlReload}
+        onCancel={cancelXmlReload}
     />
 </div>
