@@ -5,6 +5,12 @@ export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
 
+export type MEIExportOptions = {
+    basic: boolean;
+    removeIds: boolean;
+    ignoreHeader: boolean;
+};
+
 export interface SelectionInfo {
     type: 'none' | 'element';
     label?: string;

@@ -1,5 +1,12 @@
 import { get, type Writable } from "svelte/store";
-import type { EditActionSetParam, EditInfoContent, EditAction, SelectionInfo, ViewModel } from "./types";
+import type {
+    EditActionSetParam,
+    EditInfoContent,
+    EditAction,
+    MEIExportOptions,
+    SelectionInfo,
+    ViewModel,
+} from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 
@@ -196,6 +203,10 @@ export class EditorController {
         this.stores.dirty.set(false);
         this.stores.statusLine.set("Saved to local storage.");
         return exported;
+    }
+
+    async getMEI(options?: MEIExportOptions): Promise<string> {
+        return this.bridge.verovio.getMEI(options);
     }
 
     async exportSvg(): Promise<string> {

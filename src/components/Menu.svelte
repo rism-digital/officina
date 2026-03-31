@@ -5,6 +5,7 @@
     export let canZoomOut = true;
     export let canGoPrev = false;
     export let canGoNext = false;
+    export let xmlMode = false;
 
     export let onOpen: ActionHandler | null = null;
     export let onSave: ActionHandler | null = null;
@@ -13,6 +14,8 @@
     export let onZoomOut: ActionHandler | null = null;
     export let onPrevPage: ActionHandler | null = null;
     export let onNextPage: ActionHandler | null = null;
+    export let onToggleXml: ActionHandler | null = null;
+    export let onAbout: ActionHandler | null = null;
 </script>
 
 <nav class="vrv-toolbar vrv-text-no-select">
@@ -32,6 +35,22 @@
             <div class="vrv-v-separator"></div>
             <div class="vrv-menu-text" data-before="Score properties"></div>
         </div>
+    </div>
+    <div class="vrv-menu">
+        <div class="vrv-btn-text" data-before="Help"></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-v-separator"></div>
+            <div class="vrv-menu-text" data-before="About" on:click={() => onAbout?.()}></div>
+        </div>
+    </div>
+    <div class="vrv-btn-group">
+        <div class="vrv-h-separator"></div>
+        <div
+            class:toggled={xmlMode}
+            class="vrv-btn-text"
+            data-before="XML"
+            on:click={() => onToggleXml?.()}
+        ></div>
     </div>
     <div class="vrv-btn-group">
         <div class="vrv-h-separator"></div>

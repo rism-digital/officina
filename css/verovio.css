@@ -116,6 +116,25 @@
       background-color: #3c3c3c;
       border-top: 1px solid #565656;
       border-bottom: 1px solid #565656; }
+  .vrv-wrapper .vrv-xml-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: #565656;
+    color: white; }
+  .vrv-wrapper .vrv-xml-editor {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    resize: none;
+    border: 0;
+    outline: none;
+    padding: 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    color: white;
+    background: #323232; }
   .vrv-wrapper svg {
     display: block;
     margin: 0 auto; }
@@ -396,6 +415,7 @@
         max-height: 80vh; }
       .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-btn {
         background: #3c3c3c;
+        border: 1px solid #565656;
         height: 40px;
         min-width: 100px;
         display: flex;
@@ -404,6 +424,10 @@
         font-size: 16px;
         margin-left: 20px;
         padding: 0px 12px; }
+      .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-btn:focus,
+      .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-btn:focus-visible {
+        border: 1px solid #8B0000;
+        outline: none; }
       .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-btn::before {
         content: attr(data-before); }
       .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-top {

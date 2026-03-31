@@ -18,5 +18,8 @@
     "tslib": "^2.6.2",
     "typescript": "^5.5.4",
     "vite": "^7.1.4"
+  },
+  "dependencies": {
+    "marked": "^17.0.5"
   }
 }

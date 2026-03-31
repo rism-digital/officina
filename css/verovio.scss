@@ -233,6 +233,29 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
     }
 
+    .vrv-xml-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background: $background-light;
+        color: $text-color;
+    }
+
+    .vrv-xml-editor {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        resize: none;
+        border: 0;
+        outline: none;
+        padding: 12px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 13px;
+        line-height: 1.4;
+        color: $text-color;
+        background: $dialog-color;
+    }
+
     svg {
         display: block;
         margin: 0 auto;
@@ -588,6 +611,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 @extend .vrv-activable;
                 @extend .vrv-disableable;
                 background: $background;
+                border: 1px solid $background-border;
                 height: $btn-height;
                 min-width: 100px;
                 display: flex;
@@ -596,6 +620,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 font-size: 16px;
                 margin-left: 20px;
                 padding: 0px 12px;
+            }
+
+            .vrv-dialog-btn:focus,
+            .vrv-dialog-btn:focus-visible {
+                border: 1px solid $primary;
+                outline: none;
             }
 
             .vrv-dialog-btn::before {

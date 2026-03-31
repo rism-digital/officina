@@ -1,4 +1,4 @@
-import type { EditInfo, EditInfoContent, EditAction } from "../types";
+import type { EditInfo, EditInfoContent, EditAction, MEIExportOptions } from "../types";
 
 export type VerovioOptions = {
     adjustPageHeight: boolean;
@@ -29,7 +29,7 @@ export type VerovioToolkit = {
     getElementsAtTime: (time: number) => string;
     getLog: () => string;
     getOptions: () => string;
-    getMEI: () => string;
+    getMEI: (options?: MEIExportOptions) => string;
     getPageCount: () => number;
     getPageWithElement: (id: string) => number;
     loadData: (mei: string) => void;

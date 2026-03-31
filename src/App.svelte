@@ -2,11 +2,15 @@
     import { onDestroy, onMount } from "svelte";
     import { get } from "svelte/store";
     import MainPanel from "./components/MainPanel.svelte";
+    import XmlPanel from "./components/XmlPanel.svelte";
+    import DialogAbout from "./components/dialog/DialogAbout.svelte";
+    import DialogExport from "./components/dialog/DialogExport.svelte";
     import Menu from "./components/Menu.svelte";
     import Toolbar from "./components/Toolbar.svelte";
     import StatusBar from "./components/StatusBar.svelte";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
+    import type { MEIExportOptions } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -20,14 +24,36 @@
 
     const VEROVIO_URL =
         "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
-    const MEI_ALL_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-all.rng";
-    const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
+    const MEI_ALL_SCHEMA_URL =
+        "https://music-encoding.org/schema/5.1/mei-all.rng";
+    const MEI_BASIC_SCHEMA_URL =
+        "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
-    
+    const MEI_EXPORT_OPTIONS_STORAGE_KEY = "verovio-mei-export-options";
+    const DEFAULT_MEI_EXPORT_OPTIONS: MEIExportOptions = {
+        basic: false,
+        removeIds: false,
+        ignoreHeader: false
+    };
+
     let fileInput: HTMLInputElement | null = null;
     let verovioVersion = "";
     let rngMEIAll: RNGLoader | null = null;
     let rngMEIBasic: RNGLoader | null = null;
+    let xmlMode = false;
+    let xmlContent = "";
+    let aboutOpen = false;
+    let exportDialogOpen = false;
+    let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
+    let ABOUT_LIBRARIES_HTML = "";
+
+    $: ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
+* [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
+* [marked](https://marked.js.org/)\n\\n`;
+    const ABOUT_LICENSE_URL =
+        "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE";
+    const ABOUT_CHANGELOG_URL =
+        "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md"
 
     async function loadRngSchema(loader: RNGLoader, schemaUrl: string) {
         const response = await fetch(schemaUrl);
@@ -36,6 +62,12 @@
         }
         const schemaText = await response.text();
         loader.setRelaxNGSchema(schemaText);
+    }
+
+    function loadMEIExportOptionsFromStorage(): MEIExportOptions {
+        const raw = localStorage.getItem(MEI_EXPORT_OPTIONS_STORAGE_KEY);
+        if (!raw) return DEFAULT_MEI_EXPORT_OPTIONS;
+        return JSON.parse(raw) as MEIExportOptions;
     }
 
     const controller = new EditorController(
@@ -53,6 +85,7 @@
 
     onMount(async () => {
         verovioVersion = await controller.init(VEROVIO_URL);
+        meiExportOptions = loadMEIExportOptionsFromStorage();
 
         rngMEIAll = new RNGLoader();
         rngMEIBasic = new RNGLoader();
@@ -114,9 +147,70 @@
         link.click();
         URL.revokeObjectURL(url);
     }
+
+    async function toggleXmlMode() {
+        const next = !xmlMode;
+        if (next) {
+            exportDialogOpen = true;
+        } else {
+            localStorage.setItem(STORAGE_KEY, xmlContent);
+            await controller.loadData(xmlContent);
+            xmlMode = false;
+            statusLine.set("Score view enabled.");
+        }
+    }
+
+    function closeExportDialog() {
+        exportDialogOpen = false;
+    }
+
+    async function confirmExportOptions(options: MEIExportOptions) {
+        meiExportOptions = options;
+        localStorage.setItem(
+            MEI_EXPORT_OPTIONS_STORAGE_KEY,
+            JSON.stringify(meiExportOptions),
+        );
+        xmlContent = await controller.getMEI(meiExportOptions);
+        selection.set({ type: "none" });
+        xmlMode = true;
+        exportDialogOpen = false;
+        statusLine.set("XML editor enabled.");
+    }
+
+    async function applyXmlContent() {
+        if (!xmlContent.trim()) {
+            statusLine.set("XML editor is empty.");
+            return;
+        }
+        try {
+            selection.set({ type: "none" });
+            localStorage.setItem(STORAGE_KEY, xmlContent);
+            await controller.loadData(xmlContent);
+            dirty.set(false);
+            statusLine.set("Applied XML content.");
+        } catch (error) {
+            console.error("Failed to apply XML content", error);
+            statusLine.set("Failed to apply XML content.");
+        }
+    }
+
+    async function reloadXmlContent() {
+        xmlContent = await controller.getMEI();
+        statusLine.set("Reloaded XML content.");
+    }
+
+    function openAboutDialog() {
+        aboutOpen = true;
+    }
 </script>
 
-<input class="vrv-file-input" type="file" accept=".mei,.xml" bind:this={fileInput} on:change={openFile} />
+<input
+    class="vrv-file-input"
+    type="file"
+    accept=".mei,.xml"
+    bind:this={fileInput}
+    on:change={openFile}
+/>
 
 <div class="vrv-wrapper">
     <Menu
@@ -125,26 +219,70 @@
         onExport={exportDoc}
         onZoomIn={() => controller.adjustZoom(1)}
         onZoomOut={() => controller.adjustZoom(-1)}
-        onPrevPage={() => controller.setCurrentPage(get(verovioState).currentPage - 1)}
-        onNextPage={() => controller.setCurrentPage(get(verovioState).currentPage + 1)}
-        canZoom={!$workerBusy && $verovioState.pageCount > 0}
-        canZoomIn={!$workerBusy && controller.canZoomIn($verovioState.zoom)}
-        canZoomOut={!$workerBusy && controller.canZoomOut($verovioState.zoom)}
-        canGoPrev={!$workerBusy && $verovioState.currentPage > 1}
-        canGoNext={!$workerBusy && $verovioState.currentPage < $verovioState.pageCount}
+        onPrevPage={() =>
+            controller.setCurrentPage(get(verovioState).currentPage - 1)}
+        onNextPage={() =>
+            controller.setCurrentPage(get(verovioState).currentPage + 1)}
+        onToggleXml={toggleXmlMode}
+        onAbout={openAboutDialog}
+        canZoom={!xmlMode && !$workerBusy && $verovioState.pageCount > 0}
+        canZoomIn={!xmlMode &&
+            !$workerBusy &&
+            controller.canZoomIn($verovioState.zoom)}
+        canZoomOut={!xmlMode &&
+            !$workerBusy &&
+            controller.canZoomOut($verovioState.zoom)}
+        canGoPrev={!xmlMode && !$workerBusy && $verovioState.currentPage > 1}
+        canGoNext={!xmlMode &&
+            !$workerBusy &&
+            $verovioState.currentPage < $verovioState.pageCount}
+        {xmlMode}
     ></Menu>
 
-    <Toolbar mode={$mode} onToggleMode={toggleMode} />
-
-    <MainPanel
-        view={$viewModel}
-        onResize={(size) => controller.applyLayoutForSize(size)}
-        onElementSelect={(id) => controller.handleSelect(id)}
-        onAttributeEdit={(param, commit) => controller.handleAttributeEdit(param, commit)}
-        editInfoContent={$editInfoContent}
-        {rngMEIAll}
-        {rngMEIBasic}
+    <Toolbar
+        mode={$mode}
+        onToggleMode={toggleMode}
+        {xmlMode}
+        workerBusy={$workerBusy}
+        onApplyXml={applyXmlContent}
+        onReloadXml={reloadXmlContent}
     />
 
+    {#if xmlMode}
+        <XmlPanel
+            value={xmlContent}
+            workerBusy={$workerBusy}
+            onChange={(value) => (xmlContent = value)}
+        />
+    {:else}
+        <MainPanel
+            view={$viewModel}
+            onResize={(size) => controller.applyLayoutForSize(size)}
+            onElementSelect={(id) => controller.handleSelect(id)}
+            onAttributeEdit={(param, commit) =>
+                controller.handleAttributeEdit(param, commit)}
+            editInfoContent={$editInfoContent}
+            {rngMEIAll}
+            {rngMEIBasic}
+        />
+    {/if}
+
     <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
+
+    <DialogAbout
+        open={aboutOpen}
+        title="About"
+        libraries={ABOUT_LIBRARIES_HTML}
+        licenseUrl={ABOUT_LICENSE_URL}
+        changelogUrl={ABOUT_CHANGELOG_URL}
+        onClose={() => (aboutOpen = false)}
+    />
+
+    <DialogExport
+        open={exportDialogOpen}
+        value={meiExportOptions}
+        onConfirm={confirmExportOptions}
+        onCancel={closeExportDialog}
+        onClose={closeExportDialog}
+    />
 </div>
