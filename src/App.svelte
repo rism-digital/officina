@@ -3,9 +3,10 @@
     import { get } from "svelte/store";
     import MainPanel from "./components/MainPanel.svelte";
     import XmlPanel from "./components/XmlPanel.svelte";
-    import DialogAbout from "./components/dialog/DialogAbout.svelte";
-    import DialogExport from "./components/dialog/DialogExport.svelte";
-    import DialogXmlReload from "./components/dialog/DialogXmlReload.svelte";
+    import DialogAbout from "./components/dialogs/DialogAbout.svelte";
+    import DialogExport from "./components/dialogs/DialogExport.svelte";
+    import DialogScoreProperties from "./components/dialogs/DialogScoreProperties.svelte";
+    import DialogXmlReload from "./components/dialogs/DialogXmlReload.svelte";
     import Menu from "./components/Menu.svelte";
     import Toolbar from "./components/Toolbar.svelte";
     import StatusBar from "./components/StatusBar.svelte";
@@ -46,6 +47,7 @@
     let xmlContent = "";
     let aboutOpen = false;
     let exportDialogOpen = false;
+    let scorePropertiesOpen = false;
     let xmlReloadDialogOpen = false;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
@@ -229,14 +231,24 @@
         }
     }
 
-    async function reloadXmlContent() {
-        xmlContent = await controller.getMEI();
-        xmlInitialContent = xmlContent;
-        statusLine.set("Reloaded XML content.");
+    async function validateXmlContent() {
+        // Placeholder for XML validation logic
     }
 
     function openAboutDialog() {
         aboutOpen = true;
+    }
+
+    function openScorePropertiesDialog() {
+        scorePropertiesOpen = true;
+    }
+
+    function closeScorePropertiesDialog() {
+        scorePropertiesOpen = false;
+    }
+
+    function confirmScorePropertiesDialog() {
+        scorePropertiesOpen = false;
     }
 </script>
 
@@ -260,6 +272,7 @@
         onNextPage={() =>
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
+        onScoreProperties={openScorePropertiesDialog}
         canZoom={!xmlMode && !$workerBusy && $verovioState.pageCount > 0}
         canZoomIn={!xmlMode &&
             !$workerBusy &&
@@ -280,8 +293,7 @@
         onToggleMode={toggleMode}
         {xmlMode}
         workerBusy={$workerBusy}
-        onApplyXml={applyXmlContent}
-        onReloadXml={reloadXmlContent}
+        onValidateXml={validateXmlContent}
     />
 
     {#if xmlMode}
@@ -321,6 +333,14 @@
         onConfirm={confirmExportOptions}
         onCancel={closeExportDialog}
         onClose={closeExportDialog}
+    />
+
+    <DialogScoreProperties
+        open={scorePropertiesOpen}
+        editInfoContent={$editInfoContent}
+        onOk={confirmScorePropertiesDialog}
+        onCancel={closeScorePropertiesDialog}
+        onClose={closeScorePropertiesDialog}
     />
 
     <DialogXmlReload

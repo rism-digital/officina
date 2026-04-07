@@ -15,6 +15,7 @@
     export let onPrevPage: ActionHandler | null = null;
     export let onNextPage: ActionHandler | null = null;
     export let onToggleXml: ActionHandler | null = null;
+    export let onScoreProperties: ActionHandler | null = null;
     export let onAbout: ActionHandler | null = null;
 </script>
 
@@ -45,7 +46,11 @@
         <div class="vrv-btn-text" data-before="Edit"></div>
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
-            <div class="vrv-menu-text" data-before="Score properties"></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Score properties"
+                on:click={() => onScoreProperties?.()}
+            ></div>
         </div>
     </div>
     <div class="vrv-btn-group">
