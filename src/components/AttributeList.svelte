@@ -66,14 +66,30 @@
     let showBasic = false;
     let showAll = false;
 
-    function toggleBasic() {
-        showBasic = !showBasic;
-        if (!showBasic) showAll = false;
+    $: hasBasicSection = basicNames.length > 0;
+    $: hasAllSection = allNames.length > 0;
+    $: hasExpandableSection = hasBasicSection || hasAllSection;
+    $: primaryExpanded = hasBasicSection ? showBasic : showAll;
+
+    $: if (!hasBasicSection) {
+        showBasic = false;
+    }
+    $: if (!hasAllSection) {
+        showAll = false;
+    }
+
+    function togglePrimary() {
+        if (hasBasicSection) {
+            showBasic = !showBasic;
+            if (!showBasic) showAll = false;
+            return;
+        }
+        showAll = !showAll;
     }
 
     function toggleAll() {
         showAll = !showAll;
-        if (showAll) showBasic = true;
+        if (showAll && hasBasicSection) showBasic = true;
     }
 
     function emitTextEdit(attValue: string, commit: boolean) {
@@ -126,14 +142,16 @@
                     onEditAttribute={onEditSet}
                 />
             {/each}
-            <tr>
-                <td colspan="2" class="vrv-show-more">
-                    <span
-                        class={showBasic ? "more" : "close more"}
-                        on:click={toggleBasic}
-                    ></span>
-                </td>
-            </tr>
+            {#if hasExpandableSection}
+                <tr>
+                    <td colspan="2" class="vrv-show-more">
+                        <span
+                            class={primaryExpanded ? "more" : "close more"}
+                            on:click={togglePrimary}
+                        ></span>
+                    </td>
+                </tr>
+            {/if}
         </tbody>
         {#if basicNames.length > 0}
             <tbody style="display: {showBasic ? 'table-row-group' : 'none'};">
@@ -150,14 +168,16 @@
                         onEditAttribute={onEditSet}
                     />
                 {/each}
-                <tr>
-                    <td colspan="2" class="vrv-show-more">
-                        <span
-                            class={showAll ? "all" : "close all"}
-                            on:click={toggleAll}
-                        ></span>
-                    </td>
-                </tr>
+                {#if allNames.length > 0}
+                    <tr>
+                        <td colspan="2" class="vrv-show-more">
+                            <span
+                                class={showAll ? "all" : "close all"}
+                                on:click={toggleAll}
+                            ></span>
+                        </td>
+                    </tr>
+                {/if}
             </tbody>
         {/if}
         {#if allNames.length > 0}
