@@ -1,5 +1,6 @@
 <script lang="ts">
-    import type { TreeNodeData } from "../../app/types";
+    import ScorePropertiesAttributeList from "../ScorePropertiesAttributeList.svelte";
+    import type { EditActionSetParam, TreeNodeData } from "../../app/types";
     import Tree from "../Tree.svelte";
     import Dialog from "./Dialog.svelte";
 
@@ -56,6 +57,7 @@
     }
 
     function updateSelectedAttribute(name: string, value: string) {
+        if (name === "xml:id") return;
         localScoreDef = replaceNodeById(localScoreDef, selectedNodeId, (node) => ({
             ...node,
             attributes: {
@@ -72,23 +74,15 @@
         }));
     }
 
-    function normalizeAttributes(node: TreeNodeData | null): Record<string, string> {
-        if (!node?.attributes) return {};
-        return Object.fromEntries(
-            Object.entries(node.attributes).map(([key, value]) => [
-                key,
-                value == null ? "" : String(value),
-            ]),
-        );
+    function handleAttributeEdit(param: EditActionSetParam, _commit: boolean) {
+        if (!selectedNode || param.elementId !== selectedNode.id) return;
+        updateSelectedAttribute(param.attribute, param.value);
     }
 
     $: ancestors = [];
     $: selectedNode = findNodeById(localScoreDef, selectedNodeId) ?? localScoreDef;
-    $: selectedAttributes = normalizeAttributes(selectedNode);
-    $: selectedText =
-        selectedNode?.text == null || selectedNode.text === ""
-            ? ""
-            : String(selectedNode.text);
+    $: selectedText = selectedNode?.text == null ? "" : String(selectedNode.text);
+    $: showTextInput = selectedNode?.text != null;
     $: isEdited = serializeScoreDef(localScoreDef) !== initialSerializedScoreDef;
 
     $: if (!open) {
@@ -121,14 +115,14 @@
     {title}
     icon="info"
     type="okcancel"
-    boxClass="vrv-dialog-score-properties vrv-dialog-score-props"
+    boxClass="vrv-dialog-score-properties"
     onOk={handleOk}
     onCancel={handleCancel}
 >
-    <div class="vrv-dialog-score-props-columns">
-        <div class="vrv-dialog-score-props-column">
-            <div class="vrv-dialog-score-props-title">Score structure</div>
-            <div class="vrv-dialog-score-props-panel">
+    <div class="vrv-dialog-score-properties-columns">
+        <div class="vrv-dialog-score-properties-column">
+            <div class="vrv-dialog-score-properties-title">Score structure</div>
+            <div class="vrv-dialog-score-properties-panel">
                 {#if !localScoreDef}
                     <div>No score element selected.</div>
                 {:else}
@@ -141,41 +135,23 @@
                 {/if}
             </div>
         </div>
-        <div class="vrv-dialog-score-props-column">
-            <div class="vrv-dialog-score-props-title">Attributes</div>
-            <div class="vrv-dialog-score-props-panel">
+        <div class="vrv-dialog-score-properties-column">
+            <div class="vrv-dialog-score-properties-title">Attributes</div>
+            <div class="vrv-dialog-score-properties-panel">
                 {#if selectedNode}
-                    <div class="vrv-dialog-form">
-                        <div class="vrv-dialog-label">Element</div>
-                        <input
-                            class="vrv-dialog-input"
-                            value={selectedNode.element}
-                            disabled
-                        />
-
-                        {#if selectedText}
-                            <div class="vrv-dialog-label">Text</div>
-                            <input
-                                class="vrv-dialog-input"
-                                value={selectedText}
-                                on:input={(event) =>
-                                    updateSelectedText((event.target as HTMLInputElement).value)}
-                            />
-                        {/if}
-
-                        {#each Object.entries(selectedAttributes) as [name, value]}
-                            <div class="vrv-dialog-label">{name}</div>
-                            <input
-                                class="vrv-dialog-input"
-                                value={value}
-                                on:input={(event) =>
-                                    updateSelectedAttribute(
-                                        name,
-                                        (event.target as HTMLInputElement).value,
-                                    )}
-                            />
-                        {/each}
-                    </div>
+                    {#if showTextInput}
+                    <input
+                        class="vrv-dialog-score-properties-panel-text"
+                        value={selectedText}
+                        on:input={(event) =>
+                            updateSelectedText((event.target as HTMLInputElement).value)}
+                    />
+                    {:else}
+                    <ScorePropertiesAttributeList
+                        node={selectedNode}
+                        onEditSet={handleAttributeEdit}
+                    />
+                    {/if}
                 {:else}
                     <div>Select a score node to view attributes.</div>
                 {/if}

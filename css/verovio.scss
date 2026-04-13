@@ -604,12 +604,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
 
-            &.vrv-dialog-score-properties {
-                height: 75vh;
-                min-height: 75vh;
-                max-height: 75vh;
-            }
-
             .vrv-dialog-btn {
                 @extend .vrv-clickable;
                 @extend .vrv-activable;
@@ -714,15 +708,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 a,
                 a:visited {
                     color: $text-color
-                }
-            }
-
-            &.vrv-dialog-score-properties {
-                .vrv-dialog-content {
-                    display: flex;
-                    flex: 1 1 auto;
-                    min-height: 0;
-                    overflow: hidden;
                 }
             }
 
@@ -960,100 +945,30 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     // Score properties dialog
     ////////////////////////////////////////////////////////////////////////
 
-    .vrv-dialog-score {
-        &-columns {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
-            min-height: 260px;
-            height: 100%;
-        }
+    .vrv-dialog-score-properties {
+        height: 75vh;
+        min-height: 75vh;
+        max-height: 75vh;
 
-        &-column {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            min-height: 0;
-        }
-
-        &-title {
-            color: $text-color;
-            text-align: left;
-            padding: 2px 4px;
-        }
-
-        &-tree,
-        &-list,
-        &-props {
-            background: $dialog-color;
-            border: 1px solid $background-border;
-            padding: 8px;
-            overflow: auto;
-            flex: 1 1 auto;
-            min-height: 0;
-        }
-
-        &-tree-row {
-            padding: 4px 6px;
-            border-radius: 2px;
-            cursor: pointer;
-
-            &.selected {
-                background: $background-toggled;
-            }
-        }
-    }
-
-    .vrv-dialog-score-list {
-        .vrv-dialog-staff-row {
-            display: grid;
-            grid-template-columns: 24px 1fr 70px;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 6px;
-
-            &.vrv-drag-over {
-                outline: 1px dashed $primary;
-                outline-offset: 2px;
-            }
-
-            &.selected {
-                background: $background-toggled;
-            }
-        }
-
-        .vrv-dialog-staff-handle {
-            width: 24px;
-            text-align: center;
-            cursor: grab;
-            color: $background-border;
-            user-select: none;
-        }
-
-        .vrv-dialog-staff-label {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .vrv-dialog-staff-type {
-            font-size: 12px;
-            color: $background-border;
-            text-align: right;
-        }
-    }
-
-    .vrv-dialog-score-props {
         .vrv-dialog-input {
             width: 100%;
             margin: 6px 0 0 0;
+        }
+
+        .vrv-dialog-content {
+            display: flex;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
         }
 
         &-columns {
             display: grid;
             grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
             gap: 12px;
+            width: 100%;
+            flex: 1 1 auto;
+            min-width: 0;
             height: 100%;
             min-height: 0;
             overflow: hidden;
@@ -1084,12 +999,19 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             min-height: 0;
             min-width: 0;
 
+            &-text {
+                @extend .vrv-form-input;
+                box-sizing: border-box;
+                width: 100%;
+                background-color: $background-extra-light;
+                padding: 5px;
+            }
+
             .vrv-tree-breadcrumbs-wrapper {
                 max-width: 100%;
                 overflow-x: auto;
             }
         }
-
     }
 
     ////////////////////////////////////////////////////////////////////////
