@@ -10,6 +10,8 @@
     import Menu from "./components/Menu.svelte";
     import Toolbar from "./components/Toolbar.svelte";
     import StatusBar from "./components/StatusBar.svelte";
+    import workerUrl from "./app/worker/worker.ts?worker&url";
+    import { withBaseUrl } from "./app/asset-url";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
     import type { MEIExportOptions, TreeNodeData } from "./app/types";
@@ -26,12 +28,14 @@
     } from "./app/state";
 
     const VEROVIO_URL =
-        //"https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
-        "http://localhost:8001/build/verovio-toolkit-wasm.js";
+        import.meta.env.VITE_VEROVIO_URL
+        || withBaseUrl("verovio/verovio-toolkit-wasm.js");
     const MEI_ALL_SCHEMA_URL =
-        "https://music-encoding.org/schema/5.1/mei-all.rng";
+        import.meta.env.VITE_MEI_ALL_SCHEMA_URL
+        || "https://music-encoding.org/schema/5.1/mei-all.rng";
     const MEI_BASIC_SCHEMA_URL =
-        "https://music-encoding.org/schema/5.1/mei-basic.rng";
+        import.meta.env.VITE_MEI_BASIC_SCHEMA_URL
+        || "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
     const MEI_EXPORT_OPTIONS_STORAGE_KEY = "verovio-mei-export-options";
     const DEFAULT_MEI_EXPORT_OPTIONS: MEIExportOptions = {
@@ -58,9 +62,11 @@
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
 * [marked](https://marked.js.org/)\n\n`;
     const ABOUT_LICENSE_URL =
-        "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE";
+        import.meta.env.VITE_ABOUT_LICENSE_URL
+        || "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE";
     const ABOUT_CHANGELOG_URL =
-        "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md";
+        import.meta.env.VITE_ABOUT_CHANGELOG_URL
+        || "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md";
 
     async function loadRngSchema(loader: RNGLoader, schemaUrl: string) {
         const response = await fetch(schemaUrl);
@@ -78,7 +84,7 @@
     }
 
     const controller = new EditorController(
-        new URL("./app/worker/worker.ts", import.meta.url),
+        workerUrl,
         {
             verovioState,
             viewModel,

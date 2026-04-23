@@ -48,7 +48,7 @@ export class EditorController {
         xmlIdSeed: 1,
     };
 
-    constructor(workerUrl: URL, stores: ControllerStores) {
+    constructor(workerUrl: string | URL, stores: ControllerStores) {
         this.worker = new Worker(workerUrl, { type: "classic" });
         this.bridge = createWorkerBridge(this.worker);
         this.stores = stores;

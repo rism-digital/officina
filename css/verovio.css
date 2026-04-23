@@ -211,13 +211,13 @@
         padding-top: 5px;
         padding-bottom: 5px; }
       .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-menu-checked::after, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-menu-checked::after, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-menu-checked::after {
-        content: url(../icons/toolbar/checked.png);
+        content: url(/icons/toolbar/checked.png);
         padding-top: 5px;
         margin-left: 8px; }
       .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-submenu, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-submenu, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-submenu {
         float: none; }
       .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-submenu-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-submenu-text {
-        background: url(../icons/toolbar/submenu.png) no-repeat;
+        background: url(/icons/toolbar/submenu.png) no-repeat;
         background-position: center right;
         padding-right: 20px;
         margin-right: 10px;
@@ -320,13 +320,13 @@
         padding-top: 5px;
         padding-bottom: 5px; }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-checked::after, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-menu-checked::after, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-toolbar .vrv-submenu-content .vrv-menu-checked::after, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-editor-toolbar .vrv-submenu-content .vrv-menu-checked::after {
-        content: url(../icons/toolbar/checked.png);
+        content: url(/icons/toolbar/checked.png);
         padding-top: 5px;
         margin-left: 8px; }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-toolbar .vrv-submenu-content .vrv-submenu, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-editor-toolbar .vrv-submenu-content .vrv-submenu {
         float: none; }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu-text, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-toolbar .vrv-submenu-content .vrv-submenu-text, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-editor-toolbar .vrv-submenu-content .vrv-submenu-text {
-        background: url(../icons/toolbar/submenu.png) no-repeat;
+        background: url(/icons/toolbar/submenu.png) no-repeat;
         background-position: center right;
         padding-right: 20px;
         margin-right: 10px;
@@ -442,17 +442,17 @@
           height: 24px;
           margin-right: 16px; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-top .vrv-dialog-icon.warning {
-          background: url(../icons/warning.png) no-repeat center; }
+          background: url(/icons/warning.png) no-repeat center; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-top .vrv-dialog-icon.info {
-          background: url(../icons/info.png) no-repeat center; }
+          background: url(/icons/info.png) no-repeat center; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-top .vrv-dialog-icon.error {
-          background: url(../icons/error.png) no-repeat center; }
+          background: url(/icons/error.png) no-repeat center; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-top .vrv-dialog-icon.question {
-          background: url(../icons/question.png) no-repeat center; }
+          background: url(/icons/question.png) no-repeat center; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-top .vrv-dialog-title {
           flex: 1; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-top .vrv-dialog-close {
-          background: url(../icons/dialog/close.png) no-repeat center;
+          background: url(/icons/dialog/close.png) no-repeat center;
           flex: 1;
           height: 20px;
           max-width: 20px;
@@ -547,7 +547,7 @@
     .vrv-wrapper .vrv-dialog-gh-list .vrv-dialog-gh-item:before {
       content: attr(data-before); }
     .vrv-wrapper .vrv-dialog-gh-list .vrv-dialog-gh-item.checked::after {
-      content: url(../icons/toolbar/checked.png);
+      content: url(/icons/toolbar/checked.png);
       margin-left: 8px; }
   .vrv-wrapper .vrv-dialog-gh-selection {
     display: flex;
@@ -823,11 +823,11 @@
     .vrv-wrapper .vrv-tree-root .vrv-node-label.target {
       background-color: #6f6f6f; }
     .vrv-wrapper .vrv-tree-root .vrv-node-label.checked::after {
-      content: url(../icons/editor/star-red.png);
+      content: url(/icons/editor/star-red.png);
       vertical-align: middle;
       margin-left: 6px; }
     .vrv-wrapper .vrv-tree-root .vrv-node-label.checked:hover::after {
-      content: url(../icons/editor/star.png); }
+      content: url(/icons/editor/star.png); }
     .vrv-wrapper .vrv-tree-root .vrv-tree-node {
       position: relative;
       margin-left: 16px;

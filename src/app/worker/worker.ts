@@ -15,21 +15,46 @@ addEventListener(
     'message',
     function (event: MessageEvent<WorkerRequest>) {
         if ('verovioUrl' in event.data) {
-            // @ts-ignore
-            importScripts(event.data.verovioUrl);
+            const { taskId, verovioUrl } = event.data;
 
-            // Initialize the Verovio module once the script is loaded
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            verovio.module.onRuntimeInitialized = function () {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                verovio.enableLog(verovio.LOG_DEBUG);
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                verovioToolkit = new verovio.toolkit();
-                isVerovioModuleReady.resolve(null);
+            const postInitError = (error: unknown) => {
+                postMessage({
+                    taskId,
+                    method: "init",
+                    result: null,
+                    error: error instanceof Error ? error.message : String(error),
+                } as WorkerResponse);
             };
+
+            try {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                importScripts(verovioUrl);
+
+                // Initialize the Verovio module once the script is loaded
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                verovio.module.onRuntimeInitialized = function () {
+                    try {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        verovio.enableLog(verovio.LOG_DEBUG);
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        verovioToolkit = new verovio.toolkit();
+                        isVerovioModuleReady.resolve(null);
+                        postMessage({
+                            taskId,
+                            method: "init",
+                            result: null,
+                        } as WorkerResponse);
+                    } catch (error) {
+                        postInitError(error);
+                    }
+                };
+            } catch (error) {
+                postInitError(error);
+            }
             return;
         }
 

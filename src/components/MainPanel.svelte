@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
     import SidePanel from "./SidePanel.svelte";
+    import { withBaseUrl } from "../app/asset-url";
     import type { EditActionSetParam, EditActionSetHandler, EditInfoContent, SelectElementHandler, ViewModel } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
@@ -51,7 +52,7 @@
     }
 
     onMount(() => {
-        fetch("/css/filter.xml")
+        fetch(withBaseUrl("css/filter.xml"))
             .then((response) => (response.ok ? response.text() : ""))
             .then((text) => {
                 filterMarkup = text;

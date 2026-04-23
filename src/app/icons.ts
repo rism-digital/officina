@@ -1,3 +1,5 @@
+import { withBaseUrl } from "./asset-url";
+
 const meiElements = new Set([
     "accid",
     "annot",
@@ -75,9 +77,7 @@ const meiElements = new Set([
 
 export function iconFor(
     element: string,
-    baseUrl: string = import.meta.env.BASE_URL ?? "/",
 ): string {
     const normalized = meiElements.has(element) ? element : "missing";
-    const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-    return `${base}icons/mei/${normalized}.png`;
+    return withBaseUrl(`icons/mei/${normalized}.png`);
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { withBaseUrl } from "../app/asset-url";
     import type { Mode } from "../app/types";
 
     export let mode: Mode;
@@ -6,6 +7,9 @@
     export let xmlMode = false;
     export let workerBusy = false;
     export let onValidateXml: (() => void) | null = null;
+
+    const undoIconUrl = withBaseUrl("icons/editor/undo.png");
+    const redoIconUrl = withBaseUrl("icons/editor/redo.png");
 </script>
 
 <section class="vrv-editor-toolbar vrv-text-no-select">
@@ -20,10 +24,10 @@
             </div>
         </div>
         <div class="vrv-h-separator"></div>
-        <div class="vrv-btn-icon-large disabled" style="background-image: url('/icons/editor/undo.png');">
+        <div class="vrv-btn-icon-large disabled" style={`background-image: url('${undoIconUrl}');`}>
             <span class="vrv-tooltip">Undo ('Shift-Ctrl-V')</span>
         </div>
-        <div class="vrv-btn-icon-large disabled" style="background-image: url('/icons/editor/redo.png');">
+        <div class="vrv-btn-icon-large disabled" style={`background-image: url('${redoIconUrl}');`}>
             <span class="vrv-tooltip">Redo ('Shift-Ctrl-V')</span>
         </div>
     {/if}

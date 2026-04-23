@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { withBaseUrl } from "../app/asset-url";
     import type { ActionHandler } from "../app/types";
     export let canZoom = false;
     export let canZoomIn = true;
@@ -17,6 +18,11 @@
     export let onToggleXml: ActionHandler | null = null;
     export let onScoreProperties: ActionHandler | null = null;
     export let onAbout: ActionHandler | null = null;
+
+    const prevIconUrl = withBaseUrl("icons/toolbar/arrow-left.png");
+    const nextIconUrl = withBaseUrl("icons/toolbar/arrow-right.png");
+    const zoomOutIconUrl = withBaseUrl("icons/toolbar/zoom-out.png");
+    const zoomInIconUrl = withBaseUrl("icons/toolbar/zoom-in.png");
 </script>
 
 <nav class="vrv-toolbar vrv-text-no-select">
@@ -67,14 +73,14 @@
         <div
             class:disabled={!canGoPrev}
             class="vrv-btn-icon-left"
-            style="background-image: url('/icons/toolbar/arrow-left.png');"
+            style={`background-image: url('${prevIconUrl}');`}
             data-before="Previous"
             on:click={() => onPrevPage?.()}
         ></div>
         <div
             class:disabled={!canGoNext}
             class="vrv-btn-icon"
-            style="background-image: url('/icons/toolbar/arrow-right.png');"
+            style={`background-image: url('${nextIconUrl}');`}
             data-before="Next"
             on:click={() => onNextPage?.()}
         ></div>
@@ -84,14 +90,14 @@
         <div
             class:disabled={!canZoom || !canZoomOut}
             class="vrv-btn-icon-left"
-            style="background-image: url('/icons/toolbar/zoom-out.png');"
+            style={`background-image: url('${zoomOutIconUrl}');`}
             data-before="Zoom out"
             on:click={() => onZoomOut?.()}
         ></div>
         <div
             class:disabled={!canZoom || !canZoomIn}
             class="vrv-btn-icon"
-            style="background-image: url('/icons/toolbar/zoom-in.png');"
+            style={`background-image: url('${zoomInIconUrl}');`}
             data-before="Zoom in"
             on:click={() => onZoomIn?.()}
         ></div>

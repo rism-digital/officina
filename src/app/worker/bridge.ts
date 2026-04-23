@@ -4,6 +4,7 @@ import {
 } from "./verovio-types";
 
 export type VerovioInitMessage = {
+    taskId: string;
     verovioUrl: string;
 };
 
@@ -20,6 +21,7 @@ export type WorkerResponse = {
     method: string;
     args?: unknown[];
     result: unknown;
+    error?: string;
 };
 
 
@@ -53,7 +55,26 @@ export function createWorkerBridge(
         const handler = pending.get(message.taskId);
         if (!handler) return;
         pending.delete(message.taskId);
+        if (message.error) {
+            handler.reject(new Error(message.error));
+            return;
+        }
         handler.resolve(message.result);
+    });
+
+    worker.addEventListener('error', (event) => {
+        const message = event.message || 'Worker error';
+        for (const [taskId, handler] of pending) {
+            pending.delete(taskId);
+            handler.reject(new Error(message));
+        }
+    });
+
+    worker.addEventListener('messageerror', () => {
+        for (const [taskId, handler] of pending) {
+            pending.delete(taskId);
+            handler.reject(new Error('Worker message error'));
+        }
     });
 
     function call<M extends VerovioMethod>(
@@ -85,8 +106,15 @@ export function createWorkerBridge(
 
     return {
         async init(verovioUrl: string) {
-            worker.postMessage({ verovioUrl } as WorkerRequest);
-            await call('onRuntimeInitialized');
+            const taskId = `task_${seq++}`;
+            const payload: VerovioInitMessage = {
+                taskId,
+                verovioUrl,
+            };
+            await new Promise<void>((resolve, reject) => {
+                pending.set(taskId, { resolve, reject });
+                worker.postMessage(payload as WorkerRequest);
+            });
         },
         call,
         verovio

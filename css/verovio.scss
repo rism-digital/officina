@@ -372,7 +372,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
 
             .vrv-menu-checked::after {
-                content: url(../icons/toolbar/checked.png);
+                content: url(/icons/toolbar/checked.png);
                 padding-top: $menu-padding;
                 margin-left: 8px;
             }
@@ -383,7 +383,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
             .vrv-submenu-text {
                 @extend .vrv-menu-text;
-                background: url(../icons/toolbar/submenu.png) no-repeat;
+                background: url(/icons/toolbar/submenu.png) no-repeat;
                 background-position: center right;
                 padding-right: 20px;
                 margin-right: 10px;
@@ -645,19 +645,19 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 }
 
                 .vrv-dialog-icon.warning {
-                    background: url(../icons/warning.png) no-repeat center;
+                    background: url(/icons/warning.png) no-repeat center;
                 }
 
                 .vrv-dialog-icon.info {
-                    background: url(../icons/info.png) no-repeat center;
+                    background: url(/icons/info.png) no-repeat center;
                 }
 
                 .vrv-dialog-icon.error {
-                    background: url(../icons/error.png) no-repeat center;
+                    background: url(/icons/error.png) no-repeat center;
                 }
 
                 .vrv-dialog-icon.question {
-                    background: url(../icons/question.png) no-repeat center;
+                    background: url(/icons/question.png) no-repeat center;
                 }
 
                 .vrv-dialog-title {
@@ -665,7 +665,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 }
 
                 .vrv-dialog-close {
-                    background: url(../icons/dialog/close.png) no-repeat center;
+                    background: url(/icons/dialog/close.png) no-repeat center;
                     flex: 1;
                     height: 20px;
                     max-width: 20px;
@@ -810,7 +810,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
 
         .vrv-dialog-gh-item.checked::after {
-            content: url(../icons/toolbar/checked.png);
+            content: url(/icons/toolbar/checked.png);
             margin-left: 8px;
         }
     }
@@ -1207,12 +1207,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
 
         .vrv-node-label.checked::after {
-            content: url(../icons/editor/star-red.png);
+            content: url(/icons/editor/star-red.png);
             margin-left: 6px;
         }
 
         .vrv-node-label.checked:hover::after {
-            content: url(../icons/editor/star.png);
+            content: url(/icons/editor/star.png);
         }
 
         .vrv-tree-node {
