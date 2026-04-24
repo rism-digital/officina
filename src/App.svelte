@@ -27,15 +27,12 @@
         workerBusy,
     } from "./app/state";
 
-    const VEROVIO_URL =
-        import.meta.env.VITE_VEROVIO_URL
-        || withBaseUrl("verovio/verovio-toolkit-wasm.js");
-    const MEI_ALL_SCHEMA_URL =
-        import.meta.env.VITE_MEI_ALL_SCHEMA_URL
-        || "https://music-encoding.org/schema/5.1/mei-all.rng";
-    const MEI_BASIC_SCHEMA_URL =
-        import.meta.env.VITE_MEI_BASIC_SCHEMA_URL
-        || "https://music-encoding.org/schema/5.1/mei-basic.rng";
+    const VEROVIO_URL = 
+        //"https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
+        //"http://localhost:8001/build/verovio-toolkit-wasm.js";
+        withBaseUrl("verovio/verovio-toolkit-wasm.js");
+    const MEI_ALL_SCHEMA_URL ="https://music-encoding.org/schema/5.1/mei-all.rng";
+    const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
     const MEI_EXPORT_OPTIONS_STORAGE_KEY = "verovio-mei-export-options";
     const DEFAULT_MEI_EXPORT_OPTIONS: MEIExportOptions = {
