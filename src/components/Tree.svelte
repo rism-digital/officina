@@ -1,17 +1,31 @@
 <script lang="ts">
     import { tick } from "svelte";
+    import ContextMenu from "./ContextMenu.svelte";
     import TreeCrumb from "./TreeCrumb.svelte";
     import TreeNode from "./TreeNode.svelte";
-    import type { HoverElementHandler, SelectElementHandler, TreeNodeData } from "../app/types";
+    import type {
+        EditActionParam,
+        HoverElementHandler,
+        SelectElementHandler,
+        TreeContextActionHandler,
+        TreeNodeData,
+    } from "../app/types";
 
     export let ancestors: TreeNodeData[] | null = null;
     export let context: TreeNodeData | null = null;
     export let selectedId: string | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
+    export let onContextAction: TreeContextActionHandler | null = null;
 
     let breadcrumbsWrapper: HTMLDivElement | null = null;
     let treeRoot: HTMLDivElement | null = null;
+    let contextMenu: {
+        x: number;
+        y: number;
+        node: TreeNodeData;
+        parentElement: string | null;
+    } | null = null;
 
     async function scrollBreadcrumbsToEnd() {
         await tick();
@@ -40,6 +54,45 @@
     $: if (selectedId) {
         scrollToSelectedNode(selectedId);
     }
+
+    function openContextMenu(
+        node: TreeNodeData,
+        parentElement: string | null,
+        event: MouseEvent,
+    ) {
+        contextMenu = {
+            x: event.clientX,
+            y: event.clientY,
+            node,
+            parentElement,
+        };
+    }
+
+    function closeContextMenu() {
+        contextMenu = null;
+    }
+
+    function closeContextMenuOnClick(node: HTMLElement) {
+        node.addEventListener("click", closeContextMenu, { capture: true });
+        return {
+            destroy() {
+                node.removeEventListener("click", closeContextMenu, { capture: true });
+            },
+        };
+    }
+
+    function handleContextAction(action: string, label: string, param?: EditActionParam) {
+        if (!contextMenu) return;
+        onContextAction?.({
+            action,
+            param,
+            label,
+            targetId: contextMenu.node.id,
+            targetElement: contextMenu.node.element,
+            parentElement: contextMenu.parentElement,
+        });
+        closeContextMenu();
+    }
 </script>
 
 <div class="vrv-tree-breadcrumbs-wrapper" bind:this={breadcrumbsWrapper}>
@@ -57,7 +110,7 @@
         {/if}
     </div>
 </div>
-<div class="vrv-tree-root" bind:this={treeRoot}>
+<div class="vrv-tree-root" bind:this={treeRoot} use:closeContextMenuOnClick>
     {#if context}
         <TreeNode
             node={context}
@@ -65,6 +118,17 @@
             {selectedId}
             onSelect={onSelectElement}
             onHover={onHoverElement}
+            onContextMenu={openContextMenu}
         />
     {/if}
 </div>
+
+{#if contextMenu}
+    <ContextMenu
+        x={contextMenu.x}
+        y={contextMenu.y}
+        elementName={contextMenu.node.element}
+        onSelect={handleContextAction}
+        onClose={closeContextMenu}
+    />
+{/if}

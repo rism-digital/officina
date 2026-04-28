@@ -1,14 +1,24 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
+    import ContextMenu from "./ContextMenu.svelte";
     import SidePanel from "./SidePanel.svelte";
     import { withBaseUrl } from "../app/asset-url";
-    import type { EditActionSetParam, EditActionSetHandler, EditInfoContent, SelectElementHandler, ViewModel } from "../app/types";
+    import type {
+        EditActionSetParam,
+        EditActionSetHandler,
+        EditInfoContent,
+        EditActionParam,
+        SelectElementHandler,
+        TreeContextActionHandler,
+        ViewModel,
+    } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let view: ViewModel;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
+    export let onTreeContextAction: TreeContextActionHandler | null = null;
     export let editInfoContent: EditInfoContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
@@ -37,6 +47,13 @@
     let lastSelectedId: string | null = null;
     let filterMarkup: string = "";
     let mouseoverId: string = "";
+    let overlayContextMenu: {
+        x: number;
+        y: number;
+        targetId: string;
+        targetElement: string;
+        parentElement: string | null;
+    } | null = null;
 
     function emitSize(width: number, height: number) {
         if (!onResize) return;
@@ -178,6 +195,15 @@
         return node as SVGGElement;
     }
 
+    function getMEIElementName(node: SVGGElement | null): string | null {
+        if (!node) return null;
+        const ignored = new Set(["bounding-box", "notehead"]);
+        for (const className of Array.from(node.classList)) {
+            if (!ignored.has(className)) return className;
+        }
+        return null;
+    }
+
     function onSVGOverlayMouseDown(event: MouseEvent) {
         event.stopPropagation();
 
@@ -194,6 +220,51 @@
         }
 
         onElementSelect?.(node.id);
+    }
+
+    function closeOverlayContextMenu() {
+        overlayContextMenu = null;
+    }
+
+    function onSVGOverlayContextMenu(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const node = getClosestMEIElement(event.target as Element);
+        if (!node || !node.id) {
+            closeOverlayContextMenu();
+            return;
+        }
+
+        const targetElement = getMEIElementName(node);
+        if (!targetElement) {
+            closeOverlayContextMenu();
+            return;
+        }
+
+        const parentNode = getClosestMEIElement(node.parentElement);
+        const parentElement = getMEIElementName(parentNode);
+        onElementSelect?.(node.id);
+        overlayContextMenu = {
+            x: event.clientX,
+            y: event.clientY,
+            targetId: node.id,
+            targetElement,
+            parentElement,
+        };
+    }
+
+    function handleOverlayContextAction(action: string, label: string, param?: EditActionParam) {
+        if (!overlayContextMenu) return;
+        onTreeContextAction?.({
+            action,
+            param,
+            label,
+            targetId: overlayContextMenu.targetId,
+            targetElement: overlayContextMenu.targetElement,
+            parentElement: overlayContextMenu.parentElement,
+        });
+        closeOverlayContextMenu();
     }
 
     async function refreshOverlay() {
@@ -237,6 +308,7 @@
             onSelectElement={handleSelect}
             onHoverElement={handleHover}
             onEditAttribute={handleEditAttribute}
+            {onTreeContextAction}
             {editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}
@@ -249,7 +321,17 @@
                 <div
                     class="vrv-svg-overlay"
                     bind:this={svgOverlay}
+                    on:contextmenu={onSVGOverlayContextMenu}
                 ></div>
+                {#if overlayContextMenu}
+                    <ContextMenu
+                        x={overlayContextMenu.x}
+                        y={overlayContextMenu.y}
+                        elementName={overlayContextMenu.targetElement}
+                        onSelect={handleOverlayContextAction}
+                        onClose={closeOverlayContextMenu}
+                    />
+                {/if}
             </div>
             <div class="vrv-keyboard-panel" style="display: flex;"></div>
         </div>

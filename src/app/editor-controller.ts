@@ -1,6 +1,7 @@
 import { get, type Writable } from "svelte/store";
 import type {
     EditActionSetParam,
+    EditActionParam,
     EditInfoContent,
     EditAction,
     MEIExportOptions,
@@ -278,6 +279,67 @@ export class EditorController {
             console.error("Failed to update attribute", error);
             this.stores.workerBusy.set(false);
         }
+    }
+
+    async handleContextMenuEdit(
+        action: EditAction["action"],
+        param: EditActionParam | undefined,
+        context: { targetId: string; targetElement: string; parentElement: string | null },
+    ): Promise<boolean> {
+        this.stores.workerBusy.set(true);
+        try {
+            const resolvedParam = this.replaceActionPlaceholder(param, context);
+            console.log(resolvedParam);
+            const ok = await this.bridge.verovio.edit({
+                action,
+                param: resolvedParam ?? {},
+            });
+            if (!ok) {
+                this.stores.workerBusy.set(false);
+                return false;
+            }
+            await this.updateVerovioView();
+            await this.refreshContextFromSelection();
+            this.stores.dirty.set(true);
+            return true;
+        } catch (error) {
+            console.error("Failed to apply context menu action", error);
+            this.stores.workerBusy.set(false);
+            return false;
+        }
+    }
+
+    private replaceActionPlaceholder(
+        param: EditActionParam | undefined,
+        context: { targetId: string; targetElement: string; parentElement: string | null },
+    ): EditActionParam | undefined {
+        if (param === undefined) return undefined;
+        const placeholders: Record<string, string> = {
+            targetId: context.targetId,
+            targetElement: context.targetElement,
+            parentElement: context.parentElement ?? "",
+        };
+        const placeholderPattern = /^\{\{([a-zA-Z0-9_]+)\}\}$/;
+
+        const replaceValue = (value: unknown): unknown => {
+            if (typeof value === "string") {
+                const match = value.match(placeholderPattern);
+                if (match) {
+                    const key = match[1];
+                    return placeholders[key] ?? value;
+                }
+            }
+            if (Array.isArray(value)) {
+                return value.map((entry) => replaceValue(entry));
+            }
+            if (value && typeof value === "object") {
+                const entries = Object.entries(value as Record<string, unknown>);
+                return Object.fromEntries(entries.map(([k, v]) => [k, replaceValue(v)]));
+            }
+            return value;
+        };
+
+        return replaceValue(param) as EditActionParam;
     }
 
     async saveDoc(): Promise<string> {

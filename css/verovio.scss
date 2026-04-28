@@ -437,12 +437,47 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         display: none;
         overflow: visible;
         color: $text-color;
-        position: absolute;
+        position: fixed;
         top: 20px;
         left: 30px;
         z-index: 1000;
 
         @include menu;
+
+        &.open {
+            display: flex;
+        }
+
+        .vrv-context-menu-content {
+            display: flex;
+            position: static;
+            margin-top: 0px;
+            min-width: 170px;
+            max-height: min(70vh, 420px);
+            overflow: visible;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .vrv-submenu {
+            position: relative;
+        }
+
+        .vrv-submenu.disabled {
+            opacity: $disabled-opacity;
+        }
+
+        .vrv-submenu-content {
+            top: 0;
+            left: 100%;
+            max-height: min(70vh, 420px);
+            overflow-y: auto;
+        }
+
+        .vrv-menu-text.disabled,
+        .vrv-submenu-text.disabled {
+            opacity: $disabled-opacity;
+            pointer-events: none;
+        }
 
         // Activate submenu
         .vrv-menu .vrv-menu-content {

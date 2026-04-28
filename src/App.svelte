@@ -14,7 +14,7 @@
     import { withBaseUrl } from "./app/asset-url";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
-    import type { MEIExportOptions, TreeNodeData } from "./app/types";
+    import type { MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -240,6 +240,23 @@
         // Placeholder for XML validation logic
     }
 
+    async function handleTreeContextAction(action: TreeContextAction) {
+        const ok = await controller.handleContextMenuEdit(
+            action.action,
+            action.param,
+            {
+                targetId: action.targetId,
+                targetElement: action.targetElement,
+                parentElement: action.parentElement,
+            },
+        );
+        if (ok) {
+            statusLine.set(`${action.label} for <${action.targetElement}>.`);
+        } else {
+            statusLine.set(`Failed: ${action.label} for <${action.targetElement}>.`);
+        }
+    }
+
     function openAboutDialog() {
         aboutOpen = true;
     }
@@ -334,6 +351,7 @@
             onElementSelect={(id) => controller.handleSelect(id)}
             onAttributeEdit={(param, commit) =>
                 controller.handleAttributeEdit(param, commit)}
+            onTreeContextAction={handleTreeContextAction}
             editInfoContent={$editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}

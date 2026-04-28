@@ -4,9 +4,13 @@
 
     export let node: TreeNodeData;
     export let isRoot = false;
+    export let parentElement: string | null = null;
     export let selectedId: string | null = null;
     export let onSelect: SelectElementHandler | null = null;
     export let onHover: HoverElementHandler | null = null;
+    export let onContextMenu:
+        | ((node: TreeNodeData, parentElement: string | null, event: MouseEvent) => void)
+        | null = null;
 
     let htmlTreeNode: HTMLDivElement | null = null;
 
@@ -31,6 +35,14 @@
     function handleMouseLeave() {
         onHover?.(null);
     }
+
+    function handleContextMenu(event: MouseEvent) {
+        if (isRoot) return;
+        event.preventDefault();
+        if (node.id !== selectedId) return;
+        event.stopPropagation();
+        onContextMenu?.(node, parentElement, event);
+    }
 </script>
 
 <div
@@ -48,6 +60,7 @@
         data-element={node.element}
         style={`background-image: url("${iconFor(node.element)}");${isRoot ? " display: none;" : ""}`}
         on:click|stopPropagation={handleSelect}
+        on:contextmenu={handleContextMenu}
         on:mouseenter={handleMouseEnter}
         on:mouseleave={handleMouseLeave}
     >
@@ -56,7 +69,14 @@
     <div class="vrv-node-children">
         {#if node.children?.length}
             {#each node.children as child}
-                <svelte:self node={child} {selectedId} {onSelect} {onHover} />
+                <svelte:self
+                    node={child}
+                    parentElement={node.element}
+                    {selectedId}
+                    {onSelect}
+                    {onHover}
+                    {onContextMenu}
+                />
             {/each}
         {/if}
     </div>

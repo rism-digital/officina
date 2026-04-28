@@ -1,7 +1,14 @@
 <script lang="ts">
     import ContentTab from "./ContentTab.svelte";
     import ScoreTab from "./ScoreTab.svelte";
-    import type { EditActionSetHandler, EditInfoContent, HoverElementHandler, SelectElementHandler, Tab } from "../app/types";
+    import type {
+        EditActionSetHandler,
+        EditInfoContent,
+        HoverElementHandler,
+        SelectElementHandler,
+        Tab,
+        TreeContextActionHandler,
+    } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export const items: Tab[] = [
@@ -16,6 +23,7 @@
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
+    export let onTreeContextAction: TreeContextActionHandler | null = null;
 
     const handleClick = (tabValue: number) => () => {
         activeTabValue = tabValue;
@@ -45,6 +53,7 @@
                             {onSelectElement}
                             {onHoverElement}
                             {onEditAttribute}
+                            {onTreeContextAction}
                             editInfoContent={editInfoContent}
                             {rngMEIAll}
                             {rngMEIBasic}

@@ -5,6 +5,23 @@ export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
 
+export type TreeContextAction = {
+    action: string;
+    param?: EditActionParam;
+    label: string;
+    targetId: string;
+    targetElement: string;
+    parentElement: string | null;
+};
+
+export type TreeContextActionHandler = (action: TreeContextAction) => void;
+
+export type ContextMenuItem<TAction extends string = string> = {
+    label: string;
+    action: TAction;
+    param?: EditActionParam;
+};
+
 export type MEIExportOptions = {
     basic: boolean;
     removeIds: boolean;
@@ -63,7 +80,37 @@ export type EditActionSetParam = {
     value: string;
 };
 
+export type EditActionInsertParam = {
+    elementName: string;
+    elementId: string;
+    insertMode: "insertAfter" | "appendChild";
+};
+
+export type EditActionCommitParam = Record<string, never>;
+export type EditActionContextParam = {
+    elementId: string;
+};
+export type EditActionPropertiesParam =
+    | Record<string, never>
+    | {
+        scoreDef: string;
+    };
+
+export type EditActionChainStep = {
+    action: "insert" | "set" | "commit";
+    param?: EditActionSetParam | EditActionInsertParam | EditActionCommitParam;
+};
+
+export type EditActionChainParam = EditActionChainStep[];
+export type EditActionParam =
+    | EditActionSetParam
+    | EditActionInsertParam
+    | EditActionChainParam
+    | EditActionCommitParam
+    | EditActionContextParam
+    | EditActionPropertiesParam;
+
 export type EditAction = {
-    action: "commit" | "context" | "properties" | "set";
-    param?: EditActionSetParam | Record<string, unknown>;
+    action: string;
+    param?: EditActionParam;
 };
