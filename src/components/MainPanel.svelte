@@ -255,14 +255,15 @@
     }
 
     function handleOverlayContextAction(action: string, label: string, param?: EditActionParam) {
-        if (!overlayContextMenu) return;
+        const currentOverlayContextMenu = overlayContextMenu;
+        if (!currentOverlayContextMenu) return;
         onTreeContextAction?.({
             action,
             param,
             label,
-            targetId: overlayContextMenu.targetId,
-            targetElement: overlayContextMenu.targetElement,
-            parentElement: overlayContextMenu.parentElement,
+            targetId: currentOverlayContextMenu.targetId,
+            targetElement: currentOverlayContextMenu.targetElement,
+            parentElement: currentOverlayContextMenu.parentElement,
         });
         closeOverlayContextMenu();
     }
@@ -325,9 +326,9 @@
                 ></div>
                 {#if overlayContextMenu}
                     <ContextMenu
-                        x={overlayContextMenu.x}
-                        y={overlayContextMenu.y}
-                        elementName={overlayContextMenu.targetElement}
+                        x={overlayContextMenu?.x ?? 0}
+                        y={overlayContextMenu?.y ?? 0}
+                        elementName={overlayContextMenu?.targetElement ?? ""}
                         onSelect={handleOverlayContextAction}
                         onClose={closeOverlayContextMenu}
                     />

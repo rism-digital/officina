@@ -8,31 +8,59 @@
     export let onSelect: ((action: string, label: string, param?: EditActionParam) => void) | null = null;
     export let onClose: (() => void) | null = null;
 
-    type ActionCatalogEntry = {
+    type ActionCatalogActionEntry = {
         name: string;
         action: string;
     };
+    type ActionCatalogSubmenuEntry = {
+        name: string;
+        submenu: ActionCatalogEntry[];
+    };
+    type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
 
     type ActionDefinition = {
         action: string;
         param?: EditActionParam;
     };
 
-    let items: ContextMenuItem[] = [];
+    type ResolvedMenuEntry =
+        | { kind: "action"; label: string; action: string; param?: EditActionParam }
+        | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
 
-    function actionItemsFor(name: string): ContextMenuItem[] {
-        const entries = actionCatalog[name] ?? [];
-        const resolvedItems: ContextMenuItem[] = [];
+    let items: ResolvedMenuEntry[] = [];
+
+    function isActionEntry(entry: ActionCatalogEntry): entry is ActionCatalogActionEntry {
+        return "action" in entry;
+    }
+
+    function resolveEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] {
+        const resolvedItems: ResolvedMenuEntry[] = [];
         for (const entry of entries) {
-            const definition = actionDefinitions[entry.action];
-            if (!definition) continue;
+            if (isActionEntry(entry)) {
+                const definition = actionDefinitions[entry.action];
+                if (!definition) continue;
+                resolvedItems.push({
+                    kind: "action",
+                    label: entry.name,
+                    action: definition.action,
+                    param: definition.param,
+                });
+                continue;
+            }
+            const submenuItems = resolveEntries(entry.submenu);
+            if (submenuItems.length === 0) continue;
             resolvedItems.push({
+                kind: "submenu",
                 label: entry.name,
-                action: definition.action,
-                param: definition.param,
+                items: submenuItems,
             });
         }
         return resolvedItems;
+    }
+
+    function actionItemsFor(name: string): ResolvedMenuEntry[] {
+        const entries = actionCatalog[name] ?? [];
+        return resolveEntries(entries as ActionCatalogEntry[]);
     }
 
     $: items = actionItemsFor(elementName);
@@ -87,20 +115,52 @@
 >
     <div class="vrv-menu-content vrv-context-menu-content">
         {#each items as item}
-            <div
-                class="vrv-menu-text"
-                data-before={item.label}
-                role="menuitem"
-                tabindex="0"
-                on:click={() => handleAction(item.action, item.label, item.param)}
-                on:keydown={(event) =>
-                    handleActionKeydown(
-                        event,
-                        item.action,
-                        item.label,
-                        item.param,
-                    )}
-            ></div>
+            {#if item.kind === "action"}
+                <div
+                    class="vrv-menu-text"
+                    data-before={item.label}
+                    role="menuitem"
+                    tabindex="0"
+                    on:click={() => handleAction(item.action, item.label, item.param)}
+                    on:keydown={(event) =>
+                        handleActionKeydown(
+                            event,
+                            item.action,
+                            item.label,
+                            item.param,
+                        )}
+                ></div>
+            {:else}
+                <div class="vrv-submenu">
+                    <div
+                        class="vrv-submenu-text"
+                        data-before={item.label}
+                        role="menuitem"
+                        tabindex="0"
+                    ></div>
+                    <div class="vrv-submenu-content">
+                        {#each item.items as subItem}
+                            {#if subItem.kind === "action"}
+                                <div
+                                    class="vrv-menu-text"
+                                    data-before={subItem.label}
+                                    role="menuitem"
+                                    tabindex="0"
+                                    on:click={() =>
+                                        handleAction(subItem.action, subItem.label, subItem.param)}
+                                    on:keydown={(event) =>
+                                        handleActionKeydown(
+                                            event,
+                                            subItem.action,
+                                            subItem.label,
+                                            subItem.param,
+                                        )}
+                                ></div>
+                            {/if}
+                        {/each}
+                    </div>
+                </div>
+            {/if}
         {/each}
     </div>
 </div>

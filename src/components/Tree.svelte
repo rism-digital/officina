@@ -82,14 +82,15 @@
     }
 
     function handleContextAction(action: string, label: string, param?: EditActionParam) {
-        if (!contextMenu) return;
+        const currentContextMenu = contextMenu;
+        if (!currentContextMenu) return;
         onContextAction?.({
             action,
             param,
             label,
-            targetId: contextMenu.node.id,
-            targetElement: contextMenu.node.element,
-            parentElement: contextMenu.parentElement,
+            targetId: currentContextMenu.node.id,
+            targetElement: currentContextMenu.node.element,
+            parentElement: currentContextMenu.parentElement,
         });
         closeContextMenu();
     }
@@ -125,9 +126,9 @@
 
 {#if contextMenu}
     <ContextMenu
-        x={contextMenu.x}
-        y={contextMenu.y}
-        elementName={contextMenu.node.element}
+        x={contextMenu?.x ?? 0}
+        y={contextMenu?.y ?? 0}
+        elementName={contextMenu?.node?.element ?? ""}
         onSelect={handleContextAction}
         onClose={closeContextMenu}
     />

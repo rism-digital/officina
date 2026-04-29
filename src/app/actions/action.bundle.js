@@ -9,8 +9,17 @@ export const actionCatalog = {
             action: "add-articulation",
         },
         {
-            name: "Add ornam",
-            action: "add-ornam",
+            name: "Add ornament",
+            submenu: [
+                {
+                    name: "Add ornam",
+                    action: "add-ornam",
+                },
+                {
+                    name: "Add trill",
+                    action: "add-trill",
+                },
+            ],
         },
     ],
 };
@@ -88,6 +97,29 @@ export const actionDefinitions = {
                     elementId: "[chained-id]",
                     attribute: "color",
                     value: "blue",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-trill": {
+        action: "chain",
+        param: [
+            {
+                action: "insertControl",
+                param: {
+                    elementName: "trill",
+                    startId: "{{targetId}}",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "color",
+                    value: "red",
                 },
             },
             {

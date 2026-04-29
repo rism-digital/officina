@@ -5,5 +5,8 @@ const base = process.env.BASE_PATH || '/';
 
 export default defineConfig({
   base,
-  plugins: [svelte()]
+  plugins: [svelte()],
+  build: {
+    sourcemap: true
+  }
 });
