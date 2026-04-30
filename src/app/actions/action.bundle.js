@@ -24,8 +24,19 @@ export const actionCatalog = {
     ],
 };
 
+const controlEventPlace = [
+            { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
+            { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
+            { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
+        ]
+
 export const contextButtonBars = {
     note: [
+        [
+            { name: "Add flat", action: "add-accidental-flat", icon: "icons/editor/accid-flat.png" },
+            { name: "Add natural", action: "add-accidental-natural", icon: "icons/editor/accid-natural.png" },
+            { name: "Add shart", action: "add-accidental-sharp", icon: "icons/editor/accid-sharp.png" },
+        ],
         [
             { name: "Add trill", action: "add-trill", icon: "icons/mei/trill.png" },
             { name: "Add mordent", action: "add-mordent", icon: "icons/mei/mordent.png" },
@@ -37,31 +48,76 @@ export const contextButtonBars = {
             { name: "Stem up", action: "set-stem-up", icon: "icons/editor/stem-dir-up.png" },
         ],
     ],
-    hairpin: [
-        [
-            { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
-            { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
-            { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
-        ],
+    dir: [
+        controlEventPlace,
     ],
     dynam: [
-        [
-            { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
-            { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
-            { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
-        ],
+        controlEventPlace,
     ],
-    dir: [
-        [
-            { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
-            { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
-            { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
-        ],
+    fing: [
+        controlEventPlace,
     ],
+    hairpin: [
+        controlEventPlace,
+    ],
+    mordent: [
+        controlEventPlace,
+    ],
+    trill: [
+        controlEventPlace,
+    ]
 };
 
 export const actionDefinitions = {
-    "add-accidental": {
+    "add-accidental-flat": {
+        action: "chain",
+        param: [
+            {
+                action: "insert",
+                param: {
+                    elementName: "accid",
+                    elementId: "{{targetId}}",
+                    insertMode: "appendChild",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "accid",
+                    value: "f",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+     "add-accidental-natural": {
+        action: "chain",
+        param: [
+            {
+                action: "insert",
+                param: {
+                    elementName: "accid",
+                    elementId: "{{targetId}}",
+                    insertMode: "appendChild",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "accid",
+                    value: "n",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-accidental-sharp": {
         action: "chain",
         param: [
             {
