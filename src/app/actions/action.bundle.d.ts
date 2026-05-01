@@ -3,6 +3,7 @@ import type { EditAction } from "../types";
 export type ActionCatalogActionEntry = {
     name: string;
     action: string;
+    dialog?: string;
 };
 
 export type ActionCatalogSubmenuEntry = {

@@ -18,6 +18,7 @@ export type EditActionName =
 export type TreeContextAction = {
     action: EditActionName;
     param?: EditActionParam;
+    actionKey?: string;
     label: string;
     targetId: string;
     targetElement: string;

@@ -7,7 +7,7 @@
     export let y = 0;
     export let elementName = "";
     export let onSelect:
-        | ((action: EditActionName, label: string, param?: EditActionParam, dialog?: string) => void)
+        | ((action: EditActionName, label: string, param?: EditActionParam, actionKey?: string, dialog?: string) => void)
         | null = null;
     export let onClose: (() => void) | null = null;
 
@@ -28,6 +28,7 @@
             label: string;
             action: EditActionName;
             param?: EditActionParam;
+            actionKey: string;
             dialog?: string;
         }
         | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
@@ -41,6 +42,7 @@
         label: string;
         action: EditActionName;
         param?: EditActionParam;
+        actionKey: string;
         dialog?: string;
         iconUrl: string;
     };
@@ -63,6 +65,7 @@
                     label: entry.name,
                     action: definition.action,
                     param: definition.param,
+                    actionKey: entry.action,
                     dialog: entry.dialog,
                 });
                 continue;
@@ -95,6 +98,7 @@
                     label: button.name,
                     action: definition.action,
                     param: definition.param,
+                    actionKey: button.action,
                     dialog: button.dialog,
                     iconUrl: withBaseUrl(button.icon),
                 });
@@ -129,9 +133,10 @@
         action: EditActionName,
         label: string,
         param?: EditActionParam,
+        actionKey?: string,
         dialog?: string,
     ) {
-        onSelect?.(action, label, param, dialog);
+        onSelect?.(action, label, param, actionKey, dialog);
     }
 
     function handleActionKeydown(
@@ -139,11 +144,12 @@
         action: EditActionName,
         label: string,
         param?: EditActionParam,
+        actionKey?: string,
         dialog?: string,
     ) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        handleAction(action, label, param, dialog);
+        handleAction(action, label, param, actionKey, dialog);
     }
 </script>
 
@@ -179,6 +185,7 @@
                                     button.action,
                                     button.label,
                                     button.param,
+                                    button.actionKey,
                                     button.dialog,
                                 )}
                         ></button>
@@ -196,13 +203,14 @@
                     role="menuitem"
                     tabindex="0"
                     on:click={() =>
-                        handleAction(item.action, item.label, item.param, item.dialog)}
+                        handleAction(item.action, item.label, item.param, item.actionKey, item.dialog)}
                     on:keydown={(event) =>
                         handleActionKeydown(
                             event,
                             item.action,
                             item.label,
                             item.param,
+                            item.actionKey,
                             item.dialog,
                         )}
                 ></div>
@@ -227,6 +235,7 @@
                                             subItem.action,
                                             subItem.label,
                                             subItem.param,
+                                            subItem.actionKey,
                                             subItem.dialog,
                                         )}
                                     on:keydown={(event) =>
@@ -235,6 +244,7 @@
                                             subItem.action,
                                             subItem.label,
                                             subItem.param,
+                                            subItem.actionKey,
                                             subItem.dialog,
                                         )}
                                 ></div>

@@ -314,6 +314,7 @@
                 action: action.action,
                 label: action.label,
                 param: action.param,
+                actionKey: action.actionKey,
                 dialog: action.dialog,
             });
             if (next.kind === "prompt") {
@@ -333,6 +334,7 @@
             action: toolbarAction.action,
             label: toolbarAction.label,
             param: toolbarAction.param,
+            actionKey: toolbarAction.actionKey,
             targetId: object.id,
             targetElement: object.element,
             parentElement,
@@ -344,10 +346,10 @@
         action: EditActionName,
         label: string,
         param?: EditActionParam,
-        _actionKey?: string,
+        actionKey?: string,
         dialog?: string,
     ) {
-        const next = beginToolbarAction({ action, label, param, dialog });
+        const next = beginToolbarAction({ action, label, param, actionKey, dialog });
         if (next.kind === "prompt") {
             enterValueDialogState = next.dialogState;
             return;

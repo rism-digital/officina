@@ -259,6 +259,7 @@
         action: EditActionName,
         label: string,
         param?: EditActionParam,
+        actionKey?: string,
         dialog?: string,
     ) {
         const currentOverlayContextMenu = overlayContextMenu;
@@ -266,6 +267,7 @@
         onTreeContextAction?.({
             action,
             param,
+            actionKey,
             label,
             targetId: currentOverlayContextMenu.targetId,
             targetElement: currentOverlayContextMenu.targetElement,

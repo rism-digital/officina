@@ -11,6 +11,7 @@ export const actionCatalog = {
         {
             name: "Add dir",
             action: "add-dir",
+            dialog: "enter-value",
         },
         {
             name: "Add tempo",
@@ -31,13 +32,25 @@ export const actionCatalog = {
             ],
         },
     ],
+    rest: [
+        {
+            name: "Add dir",
+            action: "add-dir",
+            dialog: "enter-value",
+        },
+        {
+            name: "Add tempo",
+            action: "add-tempo",
+            dialog: "enter-value",
+        },
+    ]
 };
 
 const controlEventPlace = [
-            { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
-            { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
-            { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
-        ]
+    { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
+    { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
+    { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
+]
 
 export const contextButtonBars = {
     note: [
@@ -79,6 +92,12 @@ export const contextButtonBars = {
     mordent: [
         controlEventPlace,
     ],
+    rest: [
+        [
+            { name: "Add dir", action: "add-dir", icon: "icons/mei/dir.png", dialog: "enter-value" },
+            { name: "Add tempo", action: "add-tempo", icon: "icons/mei/tempo.png", dialog: "enter-value" },
+        ],
+    ],
     trill: [
         controlEventPlace,
     ]
@@ -109,7 +128,7 @@ export const actionDefinitions = {
             },
         ],
     },
-     "add-accidental-natural": {
+    "add-accidental-natural": {
         action: "chain",
         param: [
             {
@@ -176,7 +195,7 @@ export const actionDefinitions = {
                     value: "acc",
                 },
             },
-                        {
+            {
                 action: "set",
                 param: {
                     elementId: "[chained-id]",
@@ -189,7 +208,7 @@ export const actionDefinitions = {
             },
         ],
     },
-     "add-ornam": {
+    "add-ornam": {
         action: "chain",
         param: [
             {

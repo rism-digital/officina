@@ -77,6 +77,7 @@
         action: EditActionName,
         label: string,
         param?: EditActionParam,
+        actionKey?: string,
         dialog?: string,
     ) {
         const currentContextMenu = contextMenu;
@@ -84,6 +85,7 @@
         onContextAction?.({
             action,
             param,
+            actionKey,
             label,
             targetId: currentContextMenu.node.id,
             targetElement: currentContextMenu.node.element,
