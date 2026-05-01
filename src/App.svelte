@@ -61,6 +61,7 @@
     let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
+    let pendingTreeContextAction: TreeContextAction | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
 
@@ -289,7 +290,7 @@
         // Placeholder for XML validation logic
     }
 
-    async function handleTreeContextAction(action: TreeContextAction) {
+    async function applyTreeContextAction(action: TreeContextAction) {
         const ok = await controller.handleContextMenuEdit(
             action.action,
             action.param,
@@ -305,6 +306,23 @@
         } else {
             statusLine.set(`Failed: ${action.label} for <${action.targetElement}>.`);
         }
+    }
+
+    async function handleTreeContextAction(action: TreeContextAction) {
+        if (action.dialog && !action.dialogValue) {
+            const next = beginToolbarAction({
+                action: action.action,
+                label: action.label,
+                param: action.param,
+                dialog: action.dialog,
+            });
+            if (next.kind === "prompt") {
+                pendingTreeContextAction = action;
+                enterValueDialogState = next.dialogState;
+                return;
+            }
+        }
+        await applyTreeContextAction(action);
     }
 
     async function dispatchToolbarContextAction(toolbarAction: ToolbarDispatchAction) {
@@ -341,13 +359,27 @@
         const pendingAction = enterValueDialogState;
         enterValueDialogState = null;
         if (!pendingAction) return;
-        await dispatchToolbarContextAction(
-            resolveEnterValueDialog(pendingAction, value),
-        );
+        const resolvedAction = resolveEnterValueDialog(pendingAction, value);
+
+        const pendingContextAction = pendingTreeContextAction;
+        if (pendingContextAction) {
+            pendingTreeContextAction = null;
+            await applyTreeContextAction({
+                ...pendingContextAction,
+                action: resolvedAction.action,
+                label: resolvedAction.label,
+                param: resolvedAction.param,
+                dialogValue: resolvedAction.dialogValue,
+            });
+            return;
+        }
+
+        await dispatchToolbarContextAction(resolvedAction);
     }
 
     function cancelEnterValue() {
         enterValueDialogState = null;
+        pendingTreeContextAction = null;
     }
 
     function openAboutDialog() {

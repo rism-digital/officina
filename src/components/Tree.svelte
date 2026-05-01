@@ -73,7 +73,12 @@
         contextMenu = null;
     }
 
-    function handleContextAction(action: EditActionName, label: string, param?: EditActionParam) {
+    function handleContextAction(
+        action: EditActionName,
+        label: string,
+        param?: EditActionParam,
+        dialog?: string,
+    ) {
         const currentContextMenu = contextMenu;
         if (!currentContextMenu) return;
         onContextAction?.({
@@ -83,6 +88,7 @@
             targetId: currentContextMenu.node.id,
             targetElement: currentContextMenu.node.element,
             parentElement: currentContextMenu.parentElement,
+            dialog,
         });
         closeContextMenu();
     }

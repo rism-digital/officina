@@ -255,7 +255,12 @@
         };
     }
 
-    function handleOverlayContextAction(action: EditActionName, label: string, param?: EditActionParam) {
+    function handleOverlayContextAction(
+        action: EditActionName,
+        label: string,
+        param?: EditActionParam,
+        dialog?: string,
+    ) {
         const currentOverlayContextMenu = overlayContextMenu;
         if (!currentOverlayContextMenu) return;
         onTreeContextAction?.({
@@ -265,6 +270,7 @@
             targetId: currentOverlayContextMenu.targetId,
             targetElement: currentOverlayContextMenu.targetElement,
             parentElement: currentOverlayContextMenu.parentElement,
+            dialog,
         });
         closeOverlayContextMenu();
     }

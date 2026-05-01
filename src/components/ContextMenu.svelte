@@ -6,12 +6,15 @@
     export let x = 0;
     export let y = 0;
     export let elementName = "";
-    export let onSelect: ((action: EditActionName, label: string, param?: EditActionParam) => void) | null = null;
+    export let onSelect:
+        | ((action: EditActionName, label: string, param?: EditActionParam, dialog?: string) => void)
+        | null = null;
     export let onClose: (() => void) | null = null;
 
     type ActionCatalogActionEntry = {
         name: string;
         action: string;
+        dialog?: string;
     };
     type ActionCatalogSubmenuEntry = {
         name: string;
@@ -19,23 +22,26 @@
     };
     type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
 
-    type ActionDefinition = {
-        action: EditActionName;
-        param?: EditActionParam;
-    };
-
     type ResolvedMenuEntry =
-        | { kind: "action"; label: string; action: EditActionName; param?: EditActionParam }
+        | {
+            kind: "action";
+            label: string;
+            action: EditActionName;
+            param?: EditActionParam;
+            dialog?: string;
+        }
         | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
     type ContextButtonEntry = {
         name: string;
         action: string;
         icon: string;
+        dialog?: string;
     };
     type ResolvedContextButton = {
         label: string;
-        action: ActionDefinition["action"];
+        action: EditActionName;
         param?: EditActionParam;
+        dialog?: string;
         iconUrl: string;
     };
 
@@ -57,6 +63,7 @@
                     label: entry.name,
                     action: definition.action,
                     param: definition.param,
+                    dialog: entry.dialog,
                 });
                 continue;
             }
@@ -88,6 +95,7 @@
                     label: button.name,
                     action: definition.action,
                     param: definition.param,
+                    dialog: button.dialog,
                     iconUrl: withBaseUrl(button.icon),
                 });
             }
@@ -117,8 +125,13 @@
         }
     }
 
-    function handleAction(action: EditActionName, label: string, param?: EditActionParam) {
-        onSelect?.(action, label, param);
+    function handleAction(
+        action: EditActionName,
+        label: string,
+        param?: EditActionParam,
+        dialog?: string,
+    ) {
+        onSelect?.(action, label, param, dialog);
     }
 
     function handleActionKeydown(
@@ -126,10 +139,11 @@
         action: EditActionName,
         label: string,
         param?: EditActionParam,
+        dialog?: string,
     ) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        handleAction(action, label, param);
+        handleAction(action, label, param, dialog);
     }
 </script>
 
@@ -160,7 +174,13 @@
                             title={button.label}
                             aria-label={button.label}
                             style={`background-image: url("${button.iconUrl}");`}
-                            on:click={() => handleAction(button.action, button.label, button.param)}
+                            on:click={() =>
+                                handleAction(
+                                    button.action,
+                                    button.label,
+                                    button.param,
+                                    button.dialog,
+                                )}
                         ></button>
                     {/each}
                 </div>
@@ -175,13 +195,15 @@
                     data-before={item.label}
                     role="menuitem"
                     tabindex="0"
-                    on:click={() => handleAction(item.action, item.label, item.param)}
+                    on:click={() =>
+                        handleAction(item.action, item.label, item.param, item.dialog)}
                     on:keydown={(event) =>
                         handleActionKeydown(
                             event,
                             item.action,
                             item.label,
                             item.param,
+                            item.dialog,
                         )}
                 ></div>
             {:else}
@@ -201,13 +223,19 @@
                                     role="menuitem"
                                     tabindex="0"
                                     on:click={() =>
-                                        handleAction(subItem.action, subItem.label, subItem.param)}
+                                        handleAction(
+                                            subItem.action,
+                                            subItem.label,
+                                            subItem.param,
+                                            subItem.dialog,
+                                        )}
                                     on:keydown={(event) =>
                                         handleActionKeydown(
                                             event,
                                             subItem.action,
                                             subItem.label,
                                             subItem.param,
+                                            subItem.dialog,
                                         )}
                                 ></div>
                             {/if}

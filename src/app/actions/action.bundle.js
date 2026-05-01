@@ -15,6 +15,7 @@ export const actionCatalog = {
         {
             name: "Add tempo",
             action: "add-tempo",
+            dialog: "enter-value",
         },
         {
             name: "Add ornament",

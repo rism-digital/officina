@@ -22,6 +22,7 @@ export type TreeContextAction = {
     targetId: string;
     targetElement: string;
     parentElement: string | null;
+    dialog?: string;
     dialogValue?: string;
 };
 
