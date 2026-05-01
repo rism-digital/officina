@@ -267,24 +267,6 @@
         statusLine.set("XML editor enabled.");
     }
 
-    async function applyXmlContent() {
-        if (!xmlContent.trim()) {
-            statusLine.set("XML editor is empty.");
-            return;
-        }
-        try {
-            selection.set({ type: "none" });
-            localStorage.setItem(STORAGE_KEY, xmlContent);
-            await controller.loadData(xmlContent);
-            xmlInitialContent = xmlContent;
-            dirty.set(false);
-            statusLine.set("Applied XML content.");
-        } catch (error) {
-            console.error("Failed to apply XML content", error);
-            statusLine.set("Failed to apply XML content.");
-        }
-    }
-
     async function validateXmlContent() {
         // Placeholder for XML validation logic
     }
