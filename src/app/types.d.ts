@@ -12,6 +12,7 @@ export type TreeContextAction = {
     targetId: string;
     targetElement: string;
     parentElement: string | null;
+    dialogValue?: string;
 };
 
 export type TreeContextActionHandler = (action: TreeContextAction) => void;

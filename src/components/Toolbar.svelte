@@ -10,7 +10,7 @@
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
     export let onContextAction:
-        | ((action: string, label: string, param?: EditActionParam) => void)
+        | ((action: string, label: string, param?: EditActionParam, actionKey?: string, dialog?: string) => void)
         | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
@@ -20,11 +20,14 @@
         name: string;
         action: string;
         icon: string;
+        dialog?: string;
     };
     type ResolvedContextButton = {
+        actionKey: string;
         label: string;
         action: string;
         param?: EditActionParam;
+        dialog?: string;
         iconUrl: string;
     };
     let contextBars: ResolvedContextButton[][] = [];
@@ -39,9 +42,11 @@
                 const definition = actionDefinitions[button.action];
                 if (!definition) continue;
                 resolvedBar.push({
+                    actionKey: button.action,
                     label: button.name,
                     action: definition.action,
                     param: definition.param,
+                    dialog: button.dialog,
                     iconUrl: withBaseUrl(button.icon),
                 });
             }
@@ -79,7 +84,7 @@
                         <div
                             class="vrv-btn-icon-large"
                             style={`background-image: url("${button.iconUrl}");`}
-                            on:click={() => onContextAction?.(button.action, button.label, button.param)}
+                            on:click={() => onContextAction?.(button.action, button.label, button.param, button.actionKey, button.dialog)}
                         ></div>
                     {/each}
                 </div>

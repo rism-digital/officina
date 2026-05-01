@@ -4,6 +4,7 @@
     import MainPanel from "./components/MainPanel.svelte";
     import XmlPanel from "./components/XmlPanel.svelte";
     import DialogAbout from "./components/dialogs/DialogAbout.svelte";
+    import DialogEnterValue from "./components/dialogs/DialogEnterValue.svelte";
     import DialogExport from "./components/dialogs/DialogExport.svelte";
     import DialogScoreProperties from "./components/dialogs/DialogScoreProperties.svelte";
     import DialogXmlReload from "./components/dialogs/DialogXmlReload.svelte";
@@ -52,6 +53,13 @@
     let scorePropertiesOpen = false;
     let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
+    let enterValueDialogOpen = false;
+    let enterValueDialogTitle = "Enter value";
+    let enterValueDialogLabel = "Value";
+    let enterValueDialogDefault = "1";
+    let pendingToolbarActionWithDialog:
+        | { action: string; label: string; param?: EditActionParam; dialog: string; actionKey?: string }
+        | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
 
@@ -141,7 +149,8 @@
             aboutOpen ||
             exportDialogOpen ||
             scorePropertiesOpen ||
-            xmlReloadDialogOpen
+            xmlReloadDialogOpen ||
+            enterValueDialogOpen
         );
     }
 
@@ -279,6 +288,7 @@
                 targetId: action.targetId,
                 targetElement: action.targetElement,
                 parentElement: action.parentElement,
+                dialogValue: action.dialogValue,
             },
         );
         if (ok) {
@@ -288,7 +298,12 @@
         }
     }
 
-    async function handleToolbarContextAction(action: string, label: string, param?: EditActionParam) {
+    async function dispatchToolbarContextAction(
+        action: string,
+        label: string,
+        param?: EditActionParam,
+        dialogValue?: string,
+    ) {
         const object = $editInfoContent?.object;
         if (!object?.id || !object.element) return;
         const parentElement = $editInfoContent?.ancestors?.[0]?.element ?? null;
@@ -299,7 +314,45 @@
             targetId: object.id,
             targetElement: object.element,
             parentElement,
+            dialogValue,
         });
+    }
+
+    async function handleToolbarContextAction(
+        action: string,
+        label: string,
+        param?: EditActionParam,
+        actionKey?: string,
+        dialog?: string,
+    ) {
+        if (dialog === "enter-value") {
+            pendingToolbarActionWithDialog = { action, label, param, dialog, actionKey };
+            enterValueDialogTitle = "Enter value";
+            enterValueDialogLabel = "Value";
+            enterValueDialogDefault = "1";
+            enterValueDialogOpen = true;
+            return;
+        }
+        await dispatchToolbarContextAction(action, label, param);
+    }
+
+    async function confirmEnterValue(value: string) {
+        const pendingAction = pendingToolbarActionWithDialog;
+        enterValueDialogOpen = false;
+        pendingToolbarActionWithDialog = null;
+        if (!pendingAction) return;
+        const resolvedValue = value.trim() || enterValueDialogDefault;
+        await dispatchToolbarContextAction(
+            pendingAction.action,
+            pendingAction.label,
+            pendingAction.param,
+            resolvedValue,
+        );
+    }
+
+    function cancelEnterValue() {
+        enterValueDialogOpen = false;
+        pendingToolbarActionWithDialog = null;
     }
 
     function openAboutDialog() {
@@ -438,5 +491,14 @@
         onYes={confirmXmlReload}
         onNo={skipXmlReload}
         onCancel={cancelXmlReload}
+    />
+
+    <DialogEnterValue
+        open={enterValueDialogOpen}
+        title={enterValueDialogTitle}
+        label={enterValueDialogLabel}
+        value={enterValueDialogDefault}
+        onConfirm={confirmEnterValue}
+        onCancel={cancelEnterValue}
     />
 </div>

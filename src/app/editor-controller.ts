@@ -309,7 +309,12 @@ export class EditorController {
     async handleContextMenuEdit(
         action: EditAction["action"],
         param: EditActionParam | undefined,
-        context: { targetId: string; targetElement: string; parentElement: string | null },
+        context: {
+            targetId: string;
+            targetElement: string;
+            parentElement: string | null;
+            dialogValue?: string;
+        },
     ): Promise<boolean> {
         this.stores.workerBusy.set(true);
         try {
@@ -342,13 +347,19 @@ export class EditorController {
 
     private replaceActionPlaceholder(
         param: EditActionParam | undefined,
-        context: { targetId: string; targetElement: string; parentElement: string | null },
+        context: {
+            targetId: string;
+            targetElement: string;
+            parentElement: string | null;
+            dialogValue?: string;
+        },
     ): EditActionParam | undefined {
         if (param === undefined) return undefined;
         const placeholders: Record<string, string> = {
             targetId: context.targetId,
             targetElement: context.targetElement,
             parentElement: context.parentElement ?? "",
+            dialogValue: context.dialogValue ?? "",
         };
         const placeholderPattern = /^\{\{([a-zA-Z0-9_]+)\}\}$/;
 

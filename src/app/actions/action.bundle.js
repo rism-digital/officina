@@ -40,7 +40,7 @@ export const contextButtonBars = {
         [
             { name: "Add trill", action: "add-trill", icon: "icons/mei/trill.png" },
             { name: "Add mordent", action: "add-mordent", icon: "icons/mei/mordent.png" },
-            { name: "Add fing", action: "add-fing", icon: "icons/mei/fing.png" },
+            { name: "Add fing", action: "add-fing", icon: "icons/mei/fing.png", dialog: "enter-value" },
         ],
         [
             { name: "Stem auto", action: "set-stem-auto", icon: "icons/editor/stem-dir-auto.png" },
@@ -257,7 +257,7 @@ export const actionDefinitions = {
                 param: {
                     elementId: "[chained-id]",
                     attribute: "text",
-                    value: "1",
+                    value: "{{dialogValue}}",
                 },
             },
             {
