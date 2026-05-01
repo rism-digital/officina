@@ -9,6 +9,14 @@ export const actionCatalog = {
             action: "add-articulation",
         },
         {
+            name: "Add dir",
+            action: "add-dir",
+        },
+        {
+            name: "Add tempo",
+            action: "add-tempo",
+        },
+        {
             name: "Add ornament",
             submenu: [
                 {
@@ -40,7 +48,11 @@ export const contextButtonBars = {
         [
             { name: "Add trill", action: "add-trill", icon: "icons/mei/trill.png" },
             { name: "Add mordent", action: "add-mordent", icon: "icons/mei/mordent.png" },
+        ],
+        [
             { name: "Add fing", action: "add-fing", icon: "icons/mei/fing.png", dialog: "enter-value" },
+            { name: "Add dir", action: "add-dir", icon: "icons/mei/dir.png", dialog: "enter-value" },
+            { name: "Add tempo", action: "add-tempo", icon: "icons/mei/tempo.png", dialog: "enter-value" },
         ],
         [
             { name: "Stem auto", action: "set-stem-auto", icon: "icons/editor/stem-dir-auto.png" },
@@ -55,6 +67,9 @@ export const contextButtonBars = {
         controlEventPlace,
     ],
     fing: [
+        controlEventPlace,
+    ],
+    tempo: [
         controlEventPlace,
     ],
     hairpin: [
@@ -241,6 +256,68 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "fing",
+                    startId: "{{targetId}}",
+                },
+            },
+            {
+                action: "insert",
+                param: {
+                    elementName: "text",
+                    elementId: "[chained-id]",
+                    insertMode: "appendChild",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "text",
+                    value: "{{dialogValue}}",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-dir": {
+        action: "chain",
+        param: [
+            {
+                action: "insertControl",
+                param: {
+                    elementName: "dir",
+                    startId: "{{targetId}}",
+                },
+            },
+            {
+                action: "insert",
+                param: {
+                    elementName: "text",
+                    elementId: "[chained-id]",
+                    insertMode: "appendChild",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "text",
+                    value: "{{dialogValue}}",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-tempo": {
+        action: "chain",
+        param: [
+            {
+                action: "insertControl",
+                param: {
+                    elementName: "tempo",
                     startId: "{{targetId}}",
                 },
             },
