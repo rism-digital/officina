@@ -1,14 +1,12 @@
 <script lang="ts">
-    import type { ContextMenuItem, EditActionName, EditActionParam } from "../app/types";
+    import type { ContextAction } from "../app/types";
     import { withBaseUrl } from "../app/asset-url";
     import { actionCatalog, actionDefinitions, contextButtonBars } from "../app/actions/action.bundle";
 
     export let x = 0;
     export let y = 0;
     export let elementName = "";
-    export let onSelect:
-        | ((action: EditActionName, label: string, param?: EditActionParam, actionKey?: string, dialog?: string) => void)
-        | null = null;
+    export let onSelect: ((action: ContextAction) => void) | null = null;
     export let onClose: (() => void) | null = null;
 
     type ActionCatalogActionEntry = {
@@ -23,14 +21,7 @@
     type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
 
     type ResolvedMenuEntry =
-        | {
-            kind: "action";
-            label: string;
-            action: EditActionName;
-            param?: EditActionParam;
-            actionKey: string;
-            dialog?: string;
-        }
+        | (ContextAction & { kind: "action"; actionKey: string })
         | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
     type ContextButtonEntry = {
         name: string;
@@ -38,12 +29,8 @@
         icon: string;
         dialog?: string;
     };
-    type ResolvedContextButton = {
-        label: string;
-        action: EditActionName;
-        param?: EditActionParam;
+    type ResolvedContextButton = ContextAction & {
         actionKey: string;
-        dialog?: string;
         iconUrl: string;
     };
 
@@ -129,27 +116,17 @@
         }
     }
 
-    function handleAction(
-        action: EditActionName,
-        label: string,
-        param?: EditActionParam,
-        actionKey?: string,
-        dialog?: string,
-    ) {
-        onSelect?.(action, label, param, actionKey, dialog);
+    function handleAction(action: ContextAction) {
+        onSelect?.(action);
     }
 
     function handleActionKeydown(
         event: KeyboardEvent,
-        action: EditActionName,
-        label: string,
-        param?: EditActionParam,
-        actionKey?: string,
-        dialog?: string,
+        action: ContextAction,
     ) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        handleAction(action, label, param, actionKey, dialog);
+        handleAction(action);
     }
 </script>
 
@@ -180,14 +157,7 @@
                             title={button.label}
                             aria-label={button.label}
                             style={`background-image: url("${button.iconUrl}");`}
-                            on:click={() =>
-                                handleAction(
-                                    button.action,
-                                    button.label,
-                                    button.param,
-                                    button.actionKey,
-                                    button.dialog,
-                                )}
+                            on:click={() => handleAction(button)}
                         ></button>
                     {/each}
                 </div>
@@ -202,17 +172,8 @@
                     data-before={item.label}
                     role="menuitem"
                     tabindex="0"
-                    on:click={() =>
-                        handleAction(item.action, item.label, item.param, item.actionKey, item.dialog)}
-                    on:keydown={(event) =>
-                        handleActionKeydown(
-                            event,
-                            item.action,
-                            item.label,
-                            item.param,
-                            item.actionKey,
-                            item.dialog,
-                        )}
+                    on:click={() => handleAction(item)}
+                    on:keydown={(event) => handleActionKeydown(event, item)}
                 ></div>
             {:else}
                 <div class="vrv-submenu">
@@ -230,23 +191,9 @@
                                     data-before={subItem.label}
                                     role="menuitem"
                                     tabindex="0"
-                                    on:click={() =>
-                                        handleAction(
-                                            subItem.action,
-                                            subItem.label,
-                                            subItem.param,
-                                            subItem.actionKey,
-                                            subItem.dialog,
-                                        )}
+                                    on:click={() => handleAction(subItem)}
                                     on:keydown={(event) =>
-                                        handleActionKeydown(
-                                            event,
-                                            subItem.action,
-                                            subItem.label,
-                                            subItem.param,
-                                            subItem.actionKey,
-                                            subItem.dialog,
-                                        )}
+                                        handleActionKeydown(event, subItem)}
                                 ></div>
                             {/if}
                         {/each}

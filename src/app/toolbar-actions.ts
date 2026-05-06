@@ -1,12 +1,6 @@
-import type { EditActionName, EditActionParam } from "./types";
+import type { ContextAction, EditActionName, EditActionParam } from "./types";
 
-export type ToolbarDispatchAction = {
-    action: EditActionName;
-    label: string;
-    param?: EditActionParam;
-    actionKey?: string;
-    dialogValue?: string;
-};
+export type ToolbarDispatchAction = ContextAction;
 
 export type EnterValueDialogState = {
     action: EditActionName;

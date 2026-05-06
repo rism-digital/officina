@@ -4,11 +4,10 @@
     import SidePanel from "./SidePanel.svelte";
     import { withBaseUrl } from "../app/asset-url";
     import type {
-        EditActionName,
+        ContextAction,
         EditActionSetParam,
         EditActionSetHandler,
         EditInfoContent,
-        EditActionParam,
         SelectElementHandler,
         TreeContextActionHandler,
         ViewModel,
@@ -255,24 +254,14 @@
         };
     }
 
-    function handleOverlayContextAction(
-        action: EditActionName,
-        label: string,
-        param?: EditActionParam,
-        actionKey?: string,
-        dialog?: string,
-    ) {
+    function handleOverlayContextAction(action: ContextAction) {
         const currentOverlayContextMenu = overlayContextMenu;
         if (!currentOverlayContextMenu) return;
         onTreeContextAction?.({
-            action,
-            param,
-            actionKey,
-            label,
+            ...action,
             targetId: currentOverlayContextMenu.targetId,
             targetElement: currentOverlayContextMenu.targetElement,
             parentElement: currentOverlayContextMenu.parentElement,
-            dialog,
         });
         closeOverlayContextMenu();
     }

@@ -22,7 +22,7 @@
         type EnterValueDialogState,
         type ToolbarDispatchAction,
     } from "./app/toolbar-actions";
-    import type { EditActionName, EditActionParam, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
+    import type { ContextAction, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -342,14 +342,8 @@
         });
     }
 
-    async function handleToolbarContextAction(
-        action: EditActionName,
-        label: string,
-        param?: EditActionParam,
-        actionKey?: string,
-        dialog?: string,
-    ) {
-        const next = beginToolbarAction({ action, label, param, actionKey, dialog });
+    async function handleToolbarContextAction(action: ContextAction) {
+        const next = beginToolbarAction(action);
         if (next.kind === "prompt") {
             enterValueDialogState = next.dialogState;
             return;
@@ -506,7 +500,6 @@
         scoreDef={dialogScoreDef}
         onConfirm={confirmScorePropertiesDialog}
         onCancel={closeScorePropertiesDialog}
-        onClose={closeScorePropertiesDialog}
     />
 
     <DialogXmlReload

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { withBaseUrl } from "../app/asset-url";
     import { actionDefinitions, contextButtonBars } from "../app/actions/action.bundle";
-    import type { EditActionName, EditActionParam, Mode } from "../app/types";
+    import type { ContextAction, Mode } from "../app/types";
 
     export let mode: Mode;
     export let onToggleMode: () => void;
@@ -9,9 +9,7 @@
     export let workerBusy = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
-    export let onContextAction:
-        | ((action: EditActionName, label: string, param?: EditActionParam, actionKey?: string, dialog?: string) => void)
-        | null = null;
+    export let onContextAction: ((action: ContextAction) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
     const redoIconUrl = withBaseUrl("icons/editor/redo.png");
@@ -22,12 +20,7 @@
         icon: string;
         dialog?: string;
     };
-    type ResolvedContextButton = {
-        actionKey: string;
-        label: string;
-        action: EditActionName;
-        param?: EditActionParam;
-        dialog?: string;
+    type ResolvedContextButton = ContextAction & {
         iconUrl: string;
     };
     let contextBars: ResolvedContextButton[][] = [];
@@ -84,7 +77,7 @@
                         <div
                             class="vrv-btn-icon-large"
                             style={`background-image: url("${button.iconUrl}");`}
-                            on:click={() => onContextAction?.(button.action, button.label, button.param, button.actionKey, button.dialog)}
+                            on:click={() => onContextAction?.(button)}
                         ></div>
                     {/each}
                 </div>

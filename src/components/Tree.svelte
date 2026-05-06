@@ -4,8 +4,7 @@
     import TreeCrumb from "./TreeCrumb.svelte";
     import TreeNode from "./TreeNode.svelte";
     import type {
-        EditActionName,
-        EditActionParam,
+        ContextAction,
         HoverElementHandler,
         SelectElementHandler,
         TreeContextActionHandler,
@@ -73,24 +72,14 @@
         contextMenu = null;
     }
 
-    function handleContextAction(
-        action: EditActionName,
-        label: string,
-        param?: EditActionParam,
-        actionKey?: string,
-        dialog?: string,
-    ) {
+    function handleContextAction(action: ContextAction) {
         const currentContextMenu = contextMenu;
         if (!currentContextMenu) return;
         onContextAction?.({
-            action,
-            param,
-            actionKey,
-            label,
+            ...action,
             targetId: currentContextMenu.node.id,
             targetElement: currentContextMenu.node.element,
             parentElement: currentContextMenu.parentElement,
-            dialog,
         });
         closeContextMenu();
     }

@@ -8,9 +8,7 @@
     export let title = "Score properties";
     export let scoreDef: TreeNodeData | null = null;
     export let onConfirm: ((scoreDef: TreeNodeData | null, edited: boolean) => void) | null = null;
-    export let onOk: (() => void) | null = null;
     export let onCancel: (() => void) | null = null;
-    export let onClose: (() => void) | null = null;
 
     let selectedNodeId: string | null = null;
     let localScoreDef: TreeNodeData | null = null;
@@ -99,13 +97,10 @@
 
     function handleOk() {
         onConfirm?.(localScoreDef, isEdited);
-        onOk?.();
-        onClose?.();
     }
 
     function handleCancel() {
         onCancel?.();
-        onClose?.();
     }
 
 </script>

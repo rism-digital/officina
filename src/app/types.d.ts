@@ -15,16 +15,19 @@ export type EditActionName =
     | "properties"
     | "navigate";
 
-export type TreeContextAction = {
+export type ContextAction = {
     action: EditActionName;
+    label: string;
     param?: EditActionParam;
     actionKey?: string;
-    label: string;
+    dialog?: string;
+    dialogValue?: string;
+};
+
+export type TreeContextAction = ContextAction & {
     targetId: string;
     targetElement: string;
     parentElement: string | null;
-    dialog?: string;
-    dialogValue?: string;
 };
 
 export type TreeContextActionHandler = (action: TreeContextAction) => void;
